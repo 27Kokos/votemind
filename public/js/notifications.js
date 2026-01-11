@@ -2,13 +2,37 @@
 
 let notifications = [];
 let unreadCount = 0;
+let notificationsEnabled = true; // по умолчанию включены
 
-// Получаем элементы, если они есть
+// Получаем элементы
 const badge = document.getElementById('notification-badge');
 const menu = document.getElementById('notifications-menu');
 const list = document.getElementById('notifications-list');
 
-// Если элементов нет (например, на другой странице) — не ломаемся
+// === Проверка, включены ли уведомления ===
+async function checkNotificationsEnabled() {
+  try {
+    const res = await fetch('/api/profile');
+    if (res.ok) {
+      const data = await res.json();
+      notificationsEnabled = data.notifications_enabled === true;
+    } else {
+      console.warn('Не удалось загрузить настройки уведомлений');
+    }
+  } catch (err) {
+    console.error('Ошибка при проверке настроек уведомлений:', err);
+  }
+
+  // Применяем состояние
+  if (!notificationsEnabled) {
+    if (badge) badge.classList.add('hidden');
+    if (menu) menu.classList.add('hidden');
+    return false;
+  }
+  return true;
+}
+
+// === Обновление бейджа ===
 function updateBadge() {
   if (!badge) return;
   if (unreadCount > 0) {
@@ -19,6 +43,7 @@ function updateBadge() {
   }
 }
 
+// === Обновление UI списка ===
 function updateNotificationsUI() {
   if (!list) return;
 
@@ -42,6 +67,7 @@ function updateNotificationsUI() {
   });
 }
 
+// === Открытие уведомления ===
 async function openNotification(n) {
   if (menu) menu.classList.add('hidden');
   if (n.type === 'approved') {
@@ -51,6 +77,7 @@ async function openNotification(n) {
   }
 }
 
+// === Отметить как прочитанное ===
 async function markAsRead(id) {
   await fetch(`/notifications/${id}/read`, { method: 'POST' });
   const notif = notifications.find(n => n.id === id);
@@ -60,6 +87,7 @@ async function markAsRead(id) {
   updateNotificationsUI();
 }
 
+// === Отметить все как прочитанные ===
 async function markAllAsRead() {
   if (!menu || menu.classList.contains('hidden')) return;
   await fetch(`/notifications/read-all`, { method: 'POST' });
@@ -69,19 +97,24 @@ async function markAllAsRead() {
   updateNotificationsUI();
 }
 
+// === Переключение меню ===
 function toggleNotifications(e) {
   if (!menu || !e) return;
   e.preventDefault();
+  if (!notificationsEnabled) return; // ❌ Нельзя открыть, если выключено
   menu.classList.toggle('hidden');
   if (!menu.classList.contains('hidden')) {
     markAllAsRead();
   }
 }
 
+// === Загрузка уведомлений ===
 async function fetchGlobalNotifications() {
+  if (!notificationsEnabled) return; // ❌ Не грузим, если выключено
+
   try {
     const res = await fetch('/notifications');
-    if (!res.ok) throw new Error('Ошибка');
+    if (!res.ok) throw new Error('Ошибка загрузки');
     const data = await res.json();
     notifications = data;
     unreadCount = data.filter(n => !n.read).length;
@@ -92,8 +125,18 @@ async function fetchGlobalNotifications() {
   }
 }
 
-// Автообновление — каждые 10 сек
-setInterval(fetchGlobalNotifications, 10000);
+// === Инициализация ===
+document.addEventListener('DOMContentLoaded', async () => {
+  try {
+    // Сначала проверяем, включены ли уведомления
+    const isEnabled = await checkNotificationsEnabled();
 
-// Загружаем при старте
-document.addEventListener('DOMContentLoaded', fetchGlobalNotifications);
+    if (isEnabled) {
+      // Только если включены — начинаем автообновление
+      fetchGlobalNotifications();
+      setInterval(fetchGlobalNotifications, 10000);
+    }
+  } catch (err) {
+    console.error('Ошибка инициализации:', err);
+  }
+});

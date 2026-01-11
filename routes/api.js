@@ -10,9 +10,9 @@ router.get('/profile', (req, res) => {
 
   const userId = req.session.userId;
 
-  // Основная информация
+  // Основная информация + notifications_enabled
   const user = db.prepare(`
-    SELECT id, username, avatar_url, created_at 
+    SELECT id, username, avatar_url, created_at, notifications_enabled 
     FROM users 
     WHERE id = ?
   `).get(userId);
@@ -27,7 +27,7 @@ router.get('/profile', (req, res) => {
       (SELECT COUNT(*) FROM room_members WHERE user_id = ?) AS total_rooms
   `).get(userId, userId, userId, userId, userId);
 
-  // Самая активная комната (по количеству голосов)
+  // Самая активная комната
   const activeRoom = db.prepare(`
     SELECT r.name, COUNT(v.poll_id) as vote_count
     FROM votes v
@@ -61,7 +61,7 @@ router.get('/profile', (req, res) => {
     });
   });
 
-  // 2. Пользователь предложил голосование
+  // 2. Предложил голосование
   const submittedProps = db.prepare(`
     SELECT pp.created_at, r.name AS room_name
     FROM poll_proposals pp
@@ -80,7 +80,7 @@ router.get('/profile', (req, res) => {
     });
   });
 
-  // 3. Пользователь проголосовал
+  // 3. Проголосовал
   const votes = db.prepare(`
     SELECT v.voted_at, r.name AS room_name
     FROM votes v
@@ -100,12 +100,13 @@ router.get('/profile', (req, res) => {
     });
   });
 
-  // Сортируем: новые — сверху
+  // Сортируем
   activity.sort((a, b) => new Date(b.time) - new Date(a.time));
 
-  // Отправляем всё вместе
+  // Отправляем всё
   res.json({
     ...user,
+    notifications_enabled: user.notifications_enabled === 1,
     stats: {
       ...stats,
       approval_rate: stats.total_proposals > 0 
@@ -113,7 +114,7 @@ router.get('/profile', (req, res) => {
         : 0,
       active_room: activeRoom ? activeRoom.name : '—'
     },
-    activity  // <-- добавлено!
+    activity
   });
 });
 

@@ -56,19 +56,19 @@
         <div class="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
           <div class="flex justify-between">
             <span class="text-gray-600">Предложено:</span>
-            <span class="font-medium" id="total-proposals">0</span>
+            <span class="font-medium" id="total-proposals">—</span>
           </div>
           <div class="flex justify-between">
             <span class="text-gray-600">Одобрено:</span>
-            <span class="font-medium" id="approved-proposals">0 (0%)</span>
+            <span class="font-medium" id="approved-proposals">—</span>
           </div>
           <div class="flex justify-between">
             <span class="text-gray-600">Проголосовал:</span>
-            <span class="font-medium" id="total-votes">0 раз</span>
+            <span class="font-medium" id="total-votes">—</span>
           </div>
           <div class="flex justify-between">
             <span class="text-gray-600">Комнат:</span>
-            <span class="font-medium" id="total-rooms">0</span>
+            <span class="font-medium" id="total-rooms">—</span>
           </div>
           <div class="flex justify-between">
             <span class="text-gray-600">Самая активная:</span>
@@ -77,16 +77,31 @@
         </div>
       </div>
 
+      <!-- Управление уведомлениями -->
+      <div class="bg-gray-50 p-6 rounded-lg mb-6">
+        <h2 class="text-lg font-semibold mb-4 text-gray-800">🔔 Уведомления</h2>
+        <label class="flex items-center space-x-3 cursor-pointer">
+          <div class="relative">
+            <input type="checkbox" id="toggle-notifications" class="sr-only">
+            <div id="toggle-bg" class="w-11 h-6 bg-gray-300 rounded-full shadow-inner"></div>
+            <div id="toggle-handle" class="dot absolute w-4 h-4 bg-white rounded-full shadow -top-1 transition left-1"></div>
+          </div>
+          <span id="toggle-label" class="text-sm font-medium text-gray-700">
+            Загрузка...
+          </span>
+        </label>
+      </div>
+
       <!-- История активности -->
-      <div class="bg-gray-50 p-6 rounded-lg">
+      <div class="bg-gray-50 p-6 rounded-lg mb-6">
         <h2 class="text-lg font-semibold mb-4 text-gray-800">🕒 История активности</h2>
         <div id="activity-list">
-          <p class="text-gray-500 text-sm">Пока нет активности...</p>
+          <p class="text-gray-500 text-sm">Загрузка...</p>
         </div>
       </div>
 
       <!-- Основная информация -->
-      <div class="space-y-4 mt-6">
+      <div class="space-y-4">
         <div>
           <label class="block text-gray-700 font-medium">Имя пользователя</label>
           <p class="text-gray-900" id="username">—</p>
@@ -99,12 +114,15 @@
     </div>
   </main>
 
+  <!-- Подключаем только notifications.js -->
   <script src="/js/notifications.js"></script>
   <script>
+    // === Загрузка данных профиля и инициализация ===
     document.addEventListener('DOMContentLoaded', async () => {
       try {
         const res = await fetch('/api/profile');
         if (!res.ok) throw new Error('Не удалось загрузить профиль');
+        
         const data = await res.json();
 
         // Основная инфа
@@ -117,10 +135,12 @@
 
         // Статистика
         const s = data.stats;
-        document.getElementById('total-proposals').textContent = s.total_proposals;
-        document.getElementById('approved-proposals').textContent = `${s.approved_proposals} (${s.approval_rate}%)`;
-        document.getElementById('total-votes').textContent = `${s.total_votes} ${plural(s.total_votes, 'раз', 'раза', 'раз')}`;
-        document.getElementById('total-rooms').textContent = s.total_rooms;
+        document.getElementById('total-proposals').textContent = s.total_proposals || 0;
+        document.getElementById('approved-proposals').textContent = 
+          `${s.approved_proposals || 0} (${s.approval_rate}%)`;
+        document.getElementById('total-votes').textContent = 
+          `${s.total_votes || 0} ${plural(s.total_votes || 0, 'раз', 'раза', 'раз')}`;
+        document.getElementById('total-rooms').textContent = s.total_rooms || 0;
         document.getElementById('active-room').textContent = s.active_room;
 
         // История активности
@@ -139,11 +159,52 @@
             `;
             activityList.appendChild(el);
           });
+        } else {
+          activityList.innerHTML = '<p class="text-gray-500 text-sm">Нет активности</p>';
         }
+
+        // === Инициализация переключателя уведомлений ===
+        const toggle = document.getElementById('toggle-notifications');
+        const toggleBg = document.getElementById('toggle-bg');
+        const toggleHandle = document.getElementById('toggle-handle');
+        const toggleLabel = document.getElementById('toggle-label');
+
+        // Установка текущего состояния
+        const enabled = data.notifications_enabled;
+        toggle.checked = enabled;
+        toggleBg.classList.toggle('bg-gray-300', !enabled);
+        toggleBg.classList.toggle('bg-green-500', enabled);
+        toggleHandle.classList.toggle('left-1', !enabled);
+        toggleHandle.classList.toggle('left-6', enabled);
+        toggleLabel.textContent = enabled ? 'Уведомления включены' : 'Уведомления выключены';
+
+        // Переключение
+        toggle.addEventListener('change', async () => {
+          const newEnabled = toggle.checked;
+          try {
+            const res = await fetch('/api/toggle-notifications', {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({ enabled: newEnabled })
+            });
+
+            if (res.ok) {
+              location.reload(); // Перезагружаем, чтобы обновить UI
+            } else {
+              // Откатываем
+              toggle.checked = !newEnabled;
+              alert('Не удалось сохранить настройку');
+            }
+          } catch (err) {
+            console.error(err);
+            toggle.checked = !newEnabled;
+            alert('Ошибка подключения');
+          }
+        });
 
       } catch (err) {
         console.error('Ошибка загрузки профиля:', err);
-        alert('Не удалось загрузить данные профиля');
+        alert('Не удалось загрузить данные');
       }
     });
 
@@ -154,7 +215,7 @@
       return many;
     }
 
-    // Формат времени: 12:30
+    // Формат времени
     function formatDateTime(dateStr) {
       const date = new Date(dateStr);
       return date.toLocaleTimeString('ru', { hour: '2-digit', minute: '2-digit' });

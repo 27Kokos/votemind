@@ -50,6 +50,8 @@ app.use('/proposals', requireAuth, proposalRoutes);
 app.use('/notifications', requireAuth, notificationRoutes);
 app.use('/profile', require('./routes/profile'));
 app.use('/api', require('./routes/api'));
+app.use('/api', require('./routes/notifications-toggle'));
+
 
 
 // Основные страницы — через sendFile, а не render

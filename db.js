@@ -2,9 +2,11 @@
 const Database = require('better-sqlite3');
 const path = require('path');
 
+// Создаём подключение
 const db = new Database(path.join(__dirname, 'db.sqlite'));
 db.pragma('foreign_keys = ON');
 
+// Создаём таблицы
 const schema = `
   CREATE TABLE IF NOT EXISTS users (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -97,10 +99,10 @@ const schema = `
 db.exec(schema);
 console.log('✅ База данных инициализирована');
 
-module.exports = db;
-// db.js (обновлённый кусок в конце)
+// === Дополнительные колонки ===
 const tableInfo = db.prepare(`PRAGMA table_info(users)`).all();
 
+// 1. Добавляем avatar_url
 const hasAvatarColumn = tableInfo.some(col => col.name === 'avatar_url');
 if (!hasAvatarColumn) {
   db.exec(`ALTER TABLE users ADD COLUMN avatar_url TEXT DEFAULT '/img/default-avatar.png'`);
@@ -109,17 +111,23 @@ if (!hasAvatarColumn) {
   console.log('ℹ️ Колонка avatar_url уже существует');
 }
 
-// Проверка password_hash → password (если нужно)
+// 2. Добавляем password (если был только password_hash)
 const hasPasswordHash = tableInfo.some(col => col.name === 'password_hash');
-const hasPassword = db.prepare(`PRAGMA table_info(users)`).all().some(col => col.name === 'password');
-
+const hasPassword = tableInfo.some(col => col.name === 'password');
 if (hasPasswordHash && !hasPassword) {
-  // Если есть password_hash, но нет password — переносим
-  db.exec(`
-    ALTER TABLE users ADD COLUMN password TEXT
-  `);
-  db.exec(`
-    UPDATE users SET password = password_hash
-  `);
+  db.exec(`ALTER TABLE users ADD COLUMN password TEXT`);
+  db.exec(`UPDATE users SET password = password_hash`);
   console.log('✅ Пароли перенесены из password_hash в password');
 }
+
+// 3. Добавляем notifications_enabled
+const hasNotifColumn = tableInfo.some(col => col.name === 'notifications_enabled');
+if (!hasNotifColumn) {
+  db.exec(`ALTER TABLE users ADD COLUMN notifications_enabled INTEGER DEFAULT 1`);
+  console.log('✅ Колонка notifications_enabled добавлена в users');
+} else {
+  console.log('ℹ️ Колонка notifications_enabled уже существует');
+}
+
+// ✅ ЭКСПОРТ В САМОМ КОНЦЕ!
+module.exports = db;
