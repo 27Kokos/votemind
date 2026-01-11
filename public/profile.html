@@ -18,12 +18,14 @@
           <i class="fas fa-bell text-lg"></i>
           <span id="notification-badge" class="absolute -top-1 -right-1 bg-red-500 text-white text-xs rounded-full w-4 h-4 flex items-center justify-center hidden">0</span>
         </a>
-        <img id="header-avatar" src="/img/default-avatar.png" class="w-8 h-8 rounded-full border" alt="Аватар">
+        <a href="/profile" class="flex items-center">
+          <img id="header-avatar" src="/img/default-avatar.png" class="w-8 h-8 rounded-full border hover:ring-2 hover:ring-blue-400 transition" alt="Профиль" title="Перейти в профиль">
+        </a>
         <a href="/auth/logout" class="text-red-600 hover:text-red-800 text-sm">Выйти</a>
       </div>
     </div>
 
-    <!-- Меню уведомлений (оставь как есть) -->
+    <!-- Меню уведомлений -->
     <div id="notifications-menu" class="hidden absolute top-12 right-4 bg-white border rounded-lg shadow-lg w-80 max-h-96 overflow-y-auto z-50">
       <div class="p-3 border-b text-sm font-medium text-gray-700">Уведомления</div>
       <div id="notifications-list" class="divide-y">
@@ -37,6 +39,7 @@
     <div class="bg-white p-8 rounded-lg shadow max-w-lg mx-auto">
       <h1 class="text-2xl font-semibold mb-6 text-center">Ваш профиль</h1>
 
+      <!-- Аватар -->
       <div class="flex flex-col items-center mb-6">
         <img id="current-avatar" src="/img/default-avatar.png" class="w-24 h-24 rounded-full border mb-4" alt="Аватар">
         <form id="avatar-form" action="/profile/avatar" method="POST" enctype="multipart/form-data">
@@ -47,14 +50,50 @@
         </form>
       </div>
 
-      <div class="space-y-4">
+      <!-- Статистика -->
+      <div class="bg-gray-50 p-6 rounded-lg mb-6">
+        <h2 class="text-lg font-semibold mb-4 text-gray-800">📊 Ваша статистика</h2>
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
+          <div class="flex justify-between">
+            <span class="text-gray-600">Предложено:</span>
+            <span class="font-medium" id="total-proposals">0</span>
+          </div>
+          <div class="flex justify-between">
+            <span class="text-gray-600">Одобрено:</span>
+            <span class="font-medium" id="approved-proposals">0 (0%)</span>
+          </div>
+          <div class="flex justify-between">
+            <span class="text-gray-600">Проголосовал:</span>
+            <span class="font-medium" id="total-votes">0 раз</span>
+          </div>
+          <div class="flex justify-between">
+            <span class="text-gray-600">Комнат:</span>
+            <span class="font-medium" id="total-rooms">0</span>
+          </div>
+          <div class="flex justify-between">
+            <span class="text-gray-600">Самая активная:</span>
+            <span class="font-medium text-blue-600" id="active-room">—</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- История активности -->
+      <div class="bg-gray-50 p-6 rounded-lg">
+        <h2 class="text-lg font-semibold mb-4 text-gray-800">🕒 История активности</h2>
+        <div id="activity-list">
+          <p class="text-gray-500 text-sm">Пока нет активности...</p>
+        </div>
+      </div>
+
+      <!-- Основная информация -->
+      <div class="space-y-4 mt-6">
         <div>
           <label class="block text-gray-700 font-medium">Имя пользователя</label>
-          <p class="text-gray-900" id="username">ivan123</p>
+          <p class="text-gray-900" id="username">—</p>
         </div>
         <div>
           <label class="block text-gray-700 font-medium">Дата регистрации</label>
-          <p class="text-gray-900" id="created-at">12 апреля 2025</p>
+          <p class="text-gray-900" id="created-at">—</p>
         </div>
       </div>
     </div>
@@ -62,22 +101,64 @@
 
   <script src="/js/notifications.js"></script>
   <script>
-    // Подгружаем данные профиля
     document.addEventListener('DOMContentLoaded', async () => {
       try {
         const res = await fetch('/api/profile');
-        if (res.ok) {
-          const user = await res.json();
-          document.getElementById('username').textContent = user.username;
-          document.getElementById('created-at').textContent = new Date(user.created_at).toLocaleDateString('ru');
-          const imgSrc = user.avatar_url || '/img/default-avatar.png';
-          document.getElementById('current-avatar').src = imgSrc;
-          document.getElementById('header-avatar').src = imgSrc;
+        if (!res.ok) throw new Error('Не удалось загрузить профиль');
+        const data = await res.json();
+
+        // Основная инфа
+        document.getElementById('username').textContent = data.username;
+        document.getElementById('created-at').textContent = new Date(data.created_at).toLocaleDateString('ru');
+
+        const avatarUrl = data.avatar_url || '/img/default-avatar.png';
+        document.getElementById('current-avatar').src = avatarUrl;
+        document.getElementById('header-avatar').src = avatarUrl;
+
+        // Статистика
+        const s = data.stats;
+        document.getElementById('total-proposals').textContent = s.total_proposals;
+        document.getElementById('approved-proposals').textContent = `${s.approved_proposals} (${s.approval_rate}%)`;
+        document.getElementById('total-votes').textContent = `${s.total_votes} ${plural(s.total_votes, 'раз', 'раза', 'раз')}`;
+        document.getElementById('total-rooms').textContent = s.total_rooms;
+        document.getElementById('active-room').textContent = s.active_room;
+
+        // История активности
+        const activityList = document.getElementById('activity-list');
+        if (data.activity && data.activity.length > 0) {
+          activityList.innerHTML = '';
+          data.activity.forEach(item => {
+            const el = document.createElement('div');
+            el.className = 'flex items-start space-x-3 text-sm mb-3';
+            el.innerHTML = `
+              <span class="text-lg mt-0.5">${item.icon}</span>
+              <div>
+                <span class="text-gray-900">${item.text}</span>
+                <div class="text-gray-500 text-xs mt-0.5">${formatDateTime(item.time)}</div>
+              </div>
+            `;
+            activityList.appendChild(el);
+          });
         }
+
       } catch (err) {
         console.error('Ошибка загрузки профиля:', err);
+        alert('Не удалось загрузить данные профиля');
       }
     });
+
+    // Функция для склонения
+    function plural(n, one, two, many) {
+      if (n % 10 === 1 && n % 100 !== 11) return one;
+      if (n % 10 >= 2 && n % 10 <= 4 && (n % 100 < 10 || n % 100 >= 20)) return two;
+      return many;
+    }
+
+    // Формат времени: 12:30
+    function formatDateTime(dateStr) {
+      const date = new Date(dateStr);
+      return date.toLocaleTimeString('ru', { hour: '2-digit', minute: '2-digit' });
+    }
   </script>
 </body>
 </html>
