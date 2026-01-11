@@ -98,3 +98,28 @@ db.exec(schema);
 console.log('✅ База данных инициализирована');
 
 module.exports = db;
+// db.js (обновлённый кусок в конце)
+const tableInfo = db.prepare(`PRAGMA table_info(users)`).all();
+
+const hasAvatarColumn = tableInfo.some(col => col.name === 'avatar_url');
+if (!hasAvatarColumn) {
+  db.exec(`ALTER TABLE users ADD COLUMN avatar_url TEXT DEFAULT '/img/default-avatar.png'`);
+  console.log('✅ Колонка avatar_url добавлена в users');
+} else {
+  console.log('ℹ️ Колонка avatar_url уже существует');
+}
+
+// Проверка password_hash → password (если нужно)
+const hasPasswordHash = tableInfo.some(col => col.name === 'password_hash');
+const hasPassword = db.prepare(`PRAGMA table_info(users)`).all().some(col => col.name === 'password');
+
+if (hasPasswordHash && !hasPassword) {
+  // Если есть password_hash, но нет password — переносим
+  db.exec(`
+    ALTER TABLE users ADD COLUMN password TEXT
+  `);
+  db.exec(`
+    UPDATE users SET password = password_hash
+  `);
+  console.log('✅ Пароли перенесены из password_hash в password');
+}

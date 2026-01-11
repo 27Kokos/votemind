@@ -24,30 +24,30 @@
 <body class="bg-gray-100 min-h-screen">
 
   <!-- Хедер -->
-  <header class="bg-white shadow-sm">
-    <div class="container mx-auto px-4 py-3 flex justify-between items-center">
-      <a href="/" class="text-2xl font-bold text-gray-800">VoteMind</a>
-      <div class="flex items-center space-x-6">
-        <!-- Уведомления -->
-        <a href="#" class="text-gray-600 hover:text-gray-900 relative" onclick="toggleNotifications(event)">
-          <i class="fas fa-bell text-lg"></i>
-          <span id="notification-badge" class="absolute -top-1 -right-1 bg-red-500 text-white text-xs rounded-full w-4 h-4 flex items-center justify-center hidden">0</span>
-        </a>
-        <a href="/profile" class="text-gray-600 hover:text-gray-900">
-          <i class="fas fa-user text-lg"></i>
-        </a>
-        <a href="/auth/logout" class="text-red-600 hover:text-red-800 text-sm">Выйти</a>
-      </div>
+<header class="bg-white shadow-sm">
+  <div class="container mx-auto px-4 py-3 flex justify-between items-center">
+    <a href="/dashboard" class="text-2xl font-bold text-gray-800">VoteMind</a>
+    <div class="flex items-center space-x-6">
+      <a href="#" class="text-gray-600 hover:text-gray-900 relative" onclick="toggleNotifications(event)">
+        <i class="fas fa-bell text-lg"></i>
+        <span id="notification-badge" class="absolute -top-1 -right-1 bg-red-500 text-white text-xs rounded-full w-4 h-4 flex items-center justify-center hidden">0</span>
+      </a>
+      <a href="/profile" class="flex items-center">
+        <img id="header-avatar" src="/img/default-avatar.png" class="w-8 h-8 rounded-full border hover:ring-2 hover:ring-blue-400 transition" alt="Профиль" title="Перейти в профиль">
+      </a>
+      <a href="/auth/logout" class="text-red-600 hover:text-red-800 text-sm">Выйти</a>
     </div>
+  </div>
+  <!-- Меню уведомлений -->
+  <div id="notifications-menu" class="hidden absolute top-12 right-4 bg-white border rounded-lg shadow-lg w-80 max-h-96 overflow-y-auto z-50">
+    <div class="p-3 border-b text-sm font-medium text-gray-700">Уведомления</div>
+    <div id="notifications-list" class="divide-y">
+      <div class="p-3 text-gray-500 text-sm">Загрузка...</div>
+    </div>
+  </div>
+</header>
 
-    <!-- Меню уведомлений -->
-    <div id="notifications-menu" class="hidden absolute top-12 right-4 bg-white border rounded-lg shadow-lg w-80 max-h-96 overflow-y-auto z-50">
-      <div class="p-3 border-b text-sm font-medium text-gray-700">Уведомления</div>
-      <div id="notifications-list" class="divide-y">
-        <div class="p-3 text-gray-500 text-sm">Загрузка...</div>
-      </div>
-    </div>
-  </header>
+
 
   <!-- Контент -->
   <main class="container mx-auto px-4 py-6">
@@ -219,6 +219,8 @@
 
      <script src="/js/room.js"></script>
     <script src="/js/notifications.js"></script>
+    <script src="/js/header.js"></script>
+
   </main>
 
   <footer class="mt-12 text-center text-gray-500 text-sm">

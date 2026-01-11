@@ -48,6 +48,9 @@ app.use('/rooms', requireAuth, roomRoutes);
 app.use('/polls', requireAuth, pollRoutes);
 app.use('/proposals', requireAuth, proposalRoutes);
 app.use('/notifications', requireAuth, notificationRoutes);
+app.use('/profile', require('./routes/profile'));
+app.use('/api', require('./routes/api'));
+
 
 // Основные страницы — через sendFile, а не render
 app.get('/', (req, res) => {
