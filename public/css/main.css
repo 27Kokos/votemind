@@ -1,13 +1,139 @@
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;500;600;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+
+.header-wrapper:not(.sticky) .header-container {
+  animation: breathe 8s ease-in-out infinite;
+}
+
+@keyframes breathe {
+  0%, 100% { backdrop-filter: blur(10px); background: rgba(26, 26, 46, 0.18); }
+  50% { backdrop-filter: blur(12px); background: rgba(26, 26, 46, 0.24); }
+}
+
+/* Глобальные */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
 
 body {
   font-family: 'Inter', system-ui, sans-serif;
-  margin: 0;
-  padding: 0;
   min-height: 100vh;
-  color: #1e293b;
-  background: #f8fafc;
-  background-image: 
-    radial-gradient(circle at 10% 20%, rgba(124, 58, 237, 0.05) 0%, transparent 20%),
-    radial-gradient(circle at 90% 80%, rgba(139, 92, 246, 0.05) 0%, transparent 20%);
+  background: #0f0f1a;
+  color: #e0e0ff;
+  line-height: 1.6;
+  background-image:
+    radial-gradient(circle at 20% 30%, rgba(139, 92, 246, 0.15) 0%, transparent 30%),
+    radial-gradient(circle at 80% 70%, rgba(88, 156, 255, 0.1) 0%, transparent 30%);
+  position: relative;
+}
+
+/* Liquid glass — волны */
+body::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: url("data:image/svg+xml,%3Csvg viewBox='0 0 1440 320' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath fill='%231a1a2e' fill-opacity='0.2' d='M0,192L48,197.3C96,203,192,213,288,202.7C384,192,480,160,576,154.7C672,149,768,171,864,176C960,181,1056,171,1152,154.7C1248,139,1344,117,1392,106.7L1440,96L1440,320L1392,320C1344,320,1248,320,1152,320C1056,320,960,320,864,320C768,320,672,320,576,320C480,320,384,320,288,320C192,320,96,320,48,320L0,320Z'%3E%3C/path%3E%3C/svg%3E") repeat-x;
+  background-size: cover;
+  z-index: -1;
+  pointer-events: none;
+  animation: wave 20s linear infinite;
+}
+
+@keyframes wave {
+  0% { background-position: 0 0; }
+  100% { background-position: 1440px 0; }
+}
+
+/* Утилиты */
+.container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 20px;
+}
+
+.text-center {
+  text-align: center;
+}
+
+.mb-8 {
+  margin-bottom: 32px;
+}
+
+.mb-6 {
+  margin-bottom: 24px;
+}
+
+.mb-2 {
+  margin-bottom: 8px;
+}
+
+.p-8 {
+  padding: 32px;
+}
+
+.p-6 {
+  padding: 24px;
+}
+
+.py-2 {
+  padding: 8px 0;
+}
+
+.px-3 {
+  padding: 0 12px;
+}
+
+.font-bold {
+  font-weight: 600;
+}
+
+.font-medium {
+  font-weight: 500;
+}
+
+.text-sm {
+  font-size: 0.875rem;
+}
+
+.text-xs {
+  font-size: 0.75rem;
+}
+
+.hidden {
+  display: none !important;
+}
+
+/* Сетка */
+.profile-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 24px;
+}
+
+@media (min-width: 1024px) {
+  .profile-grid {
+    grid-template-columns: 1fr 2fr;
+  }
+}
+
+.grid-two {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+}
+
+/* Flex */
+.flex-between {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+/* Центрирование */
+.text-center {
+  text-align: center;
 }

@@ -4,153 +4,145 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Профиль — VoteMind</title>
-  <!-- Tailwind CSS -->
-  <script src="https://cdn.tailwindcss.com"></script>
   <!-- Font Awesome -->
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"/>
-  <!-- Шрифт -->
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
   <!-- Подключаем наши CSS -->
   <link rel="stylesheet" href="/css/main.css">
   <link rel="stylesheet" href="/css/header.css">
   <link rel="stylesheet" href="/css/profile.css">
   <link rel="stylesheet" href="/css/notifications.css">
 </head>
-<body class="min-h-screen bg-gradient-to-br from-blue-50 via-indigo-50 to-purple-50">
+<body>
 
   <!-- Хедер -->
-  <header class="fixed top-4 left-1/2 transform -translate-x-1/2 z-50">
-    <div class="header-wrapper relative">
-      <div class="glass header-container w-max max-w-[90vw] rounded-2xl shadow-lg">
-        <a href="/dashboard" class="font-bold text-indigo-700 hover:bg-indigo-50 px-3 py-2 rounded-lg">VoteMind</a>
-        <div class="flex items-center space-x-3">
-          <!-- Колокольчик -->
+ <header>
+  <div class="header-wrapper relative">
+    <!-- НОВАЯ ОБЁРТКА ДЛЯ ИСПРАВЛЕНИЯ ОБВОДКИ -->
+    <div class="header-border-frame">
+      <div class="header-container">
+        <a href="/dashboard" class="font-bold">VoteMind</a>
+        <div class="flex-between" style="gap: 12px;">
           <a href="#" class="relative" onclick="window.toggleNotifications(event)">
-            <i class="fas fa-bell text-base text-gray-600 hover:text-indigo-600"></i>
-            <span id="notification-badge"
-                  class="hidden absolute -top-1 -right-1 bg-indigo-600 text-white text-xs rounded-full w-4 h-4 flex items-center justify-center">0</span>
+            <i class="fas fa-bell text-base hover:text-indigo-600"></i>
+            <span id="notification-badge" class="hidden absolute -top-1 -right-1 bg-indigo-600 text-white text-xs rounded-full w-4 h-4 flex items-center justify-center">0</span>
           </a>
-          <!-- Профиль -->
-          <a href="/profile" class="flex items-center space-x-2 hover:bg-gray-100 px-2 py-1 rounded-lg">
-            <img id="header-avatar" src="/img/default-avatar.png" class="avatar rounded-full" alt="Профиль">
-            <span class="text-xs font-medium text-gray-700">Профиль</span>
+          <a href="/profile" class="flex-between hover:bg-gray-100 px-2 py-1 rounded-lg" style="gap: 6px;">
+            <img id="header-avatar" src="/img/default-avatar.png" class="avatar" alt="Профиль">
+            <span class="text-xs font-medium">Профиль</span>
           </a>
-          <!-- Выйти -->
           <a href="/auth/logout" class="text-xs text-red-600 hover:text-red-800">Выйти</a>
         </div>
       </div>
+    </div>
 
-      <!-- Меню уведомлений — внутри header-wrapper -->
-      <div id="notifications-menu" class="glass hidden w-80 rounded-xl shadow-xl z-50 overflow-hidden">
-        <div class="p-3 border-b border-white/30 text-sm font-medium text-gray-700">Уведомления</div>
-        <div id="notifications-list">
-          <div class="p-3 text-gray-500 text-sm">Загрузка...</div>
+    <!-- Меню уведомлений -->
+    <div id="notifications-menu" class="glass hidden w-80 rounded-xl shadow-xl z-50 overflow-hidden">
+      <div class="p-3 border-b border-white/30 text-sm font-medium text-gray-700">Уведомления</div>
+      <div id="notifications-list">
+        <div class="p-3 text-gray-500 text-sm">Загрузка...</div>
+      </div>
+    </div>
+  </div>
+</header>
+
+
+  <!-- Отступ под хедер -->
+  <div class="spacer" style="height: 80px;"></div>
+
+
+  <!-- Контент -->
+  <main class="container">
+    <div class="text-center mb-8">
+      <!-- Карточка профиля -->
+      <div class="card p-8">
+        <img id="current-avatar" src="/img/default-avatar.png" class="avatar-large" alt="Аватар">
+        <h1 class="text-3xl font-bold mb-2">Ваш профиль</h1>
+        <p>Персональная статистика и активность</p>
+      </div>
+    </div>
+
+    <!-- Инфо и статистика -->
+    <div class="profile-grid mb-8">
+      <!-- Основная информация -->
+      <div class="card p-6">
+        <h3 class="section-title">
+          <i class="fas fa-user text-indigo-600"></i> Личные данные
+        </h3>
+        <div class="space-y-4">
+          <div class="flex-between">
+            <span class="text-sm">Имя пользователя</span>
+            <span class="font-medium" id="username">—</span>
+          </div>
+          <div class="flex-between">
+            <span class="text-sm">Дата регистрации</span>
+            <span class="font-medium" id="created-at">—</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Статистика -->
+      <div class="card p-6">
+        <h3 class="section-title">
+          <i class="fas fa-chart-bar text-indigo-600"></i> Статистика
+        </h3>
+        <div class="grid-two text-sm">
+          <div class="flex-between">
+            <span>Предложено</span>
+            <span class="font-medium" id="total-proposals">—</span>
+          </div>
+          <div class="flex-between">
+            <span>Одобрено</span>
+            <span class="font-medium" id="approved-proposals">—</span>
+          </div>
+          <div class="flex-between">
+            <span>Проголосовал</span>
+            <span class="font-medium" id="total-votes">—</span>
+          </div>
+          <div class="flex-between">
+            <span>Комнат</span>
+            <span class="font-medium" id="total-rooms">—</span>
+          </div>
+          <div class="flex-between">
+            <span>Самая активная</span>
+            <span class="font-medium text-blue-600" id="active-room">—</span>
+          </div>
         </div>
       </div>
     </div>
-  </header>
 
-  <!-- Отступ под хедер -->
-  <div class="spacer h-16"></div>
-
-  <!-- Контент -->
-  <main class="container mx-auto px-8 py-12">
-    <div class="max-w-3xl mx-auto">
-      <!-- Карточка профиля -->
-      <div class="card p-8 mb-8 text-center">
-        <img id="current-avatar" src="/img/default-avatar.png" class="avatar-large rounded-full mx-auto mb-6" alt="Аватар">
-        <h1 class="text-3xl font-bold text-gray-900 mb-2">Ваш профиль</h1>
-        <p class="text-gray-600">Персональная статистика и активность</p>
+    <!-- История активности -->
+    <div class="card p-6 mb-8">
+      <h3 class="section-title">
+        <i class="fas fa-history text-indigo-600"></i> История активности
+      </h3>
+      <div id="activity-list" class="space-y-3">
+        <div class="text-gray-500 text-sm">Загрузка...</div>
       </div>
+    </div>
 
-      <!-- Инфо и статистика -->
-      <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-8">
-        <!-- Основная информация -->
-        <div class="lg:col-span-1 card p-6">
-          <h3 class="section-title">
-            <i class="fas fa-user text-indigo-600 mr-2"></i>Личные данные
-          </h3>
-          <div class="space-y-4 text-sm">
-            <div class="flex justify-between">
-              <span class="text-gray-600">Имя пользователя</span>
-              <span class="font-medium" id="username">—</span>
-            </div>
-            <div class="flex justify-between">
-              <span class="text-gray-600">Дата регистрации</span>
-              <span class="font-medium" id="created-at">—</span>
-            </div>
-          </div>
+    <!-- Уведомления -->
+    <div class="card p-6 mb-8">
+      <h3 class="section-title">
+        <i class="fas fa-bell text-indigo-600"></i> Уведомления
+      </h3>
+      <label class="flex-between cursor-pointer">
+        <div class="toggle-switch">
+          <input type="checkbox" id="toggle-notifications">
+          <span class="toggle-bg" id="toggle-bg"></span>
         </div>
+        <span id="toggle-label" class="text-sm font-medium">Загрузка...</span>
+      </label>
+    </div>
 
-        <!-- Статистика -->
-        <div class="lg:col-span-2 card p-6">
-          <h3 class="section-title">
-            <i class="fas fa-chart-bar text-indigo-600 mr-2"></i>Статистика
-          </h3>
-          <div class="grid grid-cols-2 gap-4 text-sm">
-            <div class="flex justify-between">
-              <span class="text-gray-600">Предложено</span>
-              <span class="font-medium" id="total-proposals">—</span>
-            </div>
-            <div class="flex justify-between">
-              <span class="text-gray-600">Одобрено</span>
-              <span class="font-medium" id="approved-proposals">—</span>
-            </div>
-            <div class="flex justify-between">
-              <span class="text-gray-600">Проголосовал</span>
-              <span class="font-medium" id="total-votes">—</span>
-            </div>
-            <div class="flex justify-between">
-              <span class="text-gray-600">Комнат</span>
-              <span class="font-medium" id="total-rooms">—</span>
-            </div>
-            <div class="flex justify-between">
-              <span class="text-gray-600">Самая активная</span>
-              <span class="font-medium text-blue-600" id="active-room">—</span>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      <!-- История активности -->
-      <div class="card p-6 mb-8">
-        <h3 class="section-title">
-          <i class="fas fa-history text-indigo-600 mr-2"></i>История активности
-        </h3>
-        <div id="activity-list" class="space-y-3">
-          <div class="text-gray-500 text-sm">Загрузка...</div>
-        </div>
-      </div>
-
-      <!-- Управление уведомлениями -->
-      <div class="card p-6 mb-8">
-        <h3 class="section-title">
-          <i class="fas fa-bell text-indigo-600 mr-2"></i>Уведомления
-        </h3>
-        <label class="flex items-center space-x-3 cursor-pointer">
-          <div class="toggle-switch">
-            <input type="checkbox" id="toggle-notifications">
-            <span class="toggle-bg" id="toggle-bg"></span>
-          </div>
-          <span id="toggle-label" class="text-sm font-medium text-gray-700">Загрузка...</span>
+    <!-- Кнопка изменить фото -->
+    <div class="text-center mb-8">
+      <form id="avatar-form" action="/profile/avatar" method="POST" enctype="multipart/form-data">
+        <label class="glass-btn cursor-pointer">
+          <i class="fas fa-upload"></i> Изменить фото
+          <input type="file" name="avatar" accept="image/*" class="hidden" onchange="this.form.submit()">
         </label>
-      </div>
-
-      <!-- Кнопка изменить фото -->
-<div class="text-center">
-  <form id="avatar-form" action="/profile/avatar" method="POST" enctype="multipart/form-data" class="inline-block">
-    <label class="glass-btn cursor-pointer">
-      <i class="fas fa-upload mr-2"></i>Изменить фото
-      <input 
-        type="file" 
-        name="avatar" 
-        accept="image/*" 
-        class="hidden" 
-        onchange="this.form.submit()">
-    </label>
-  </form>
-</div>
-
+      </form>
+    </div>
   </main>
 
   <!-- Подключаем JS -->
@@ -177,7 +169,6 @@
         
         const data = await res.json();
 
-        // Основная инфа
         document.getElementById('username').textContent = data.username;
         document.getElementById('created-at').textContent = new Date(data.created_at).toLocaleDateString('ru');
 
@@ -188,7 +179,6 @@
 
         document.getElementById('header-avatar').src = avatarUrl;
 
-        // Статистика
         const s = data.stats;
         document.getElementById('total-proposals').textContent = s.total_proposals || 0;
         document.getElementById('approved-proposals').textContent = `${s.approved_proposals || 0} (${s.approval_rate}%)`;
@@ -196,7 +186,6 @@
         document.getElementById('total-rooms').textContent = s.total_rooms || 0;
         document.getElementById('active-room').textContent = s.active_room;
 
-        // История активности
         const activityList = document.getElementById('activity-list');
         if (data.activity && data.activity.length > 0) {
           activityList.innerHTML = '';
@@ -218,7 +207,6 @@
           activityList.innerHTML = '<p class="text-gray-500 text-sm">Нет активности</p>';
         }
 
-        // Переключатель уведомлений
         const toggle = document.getElementById('toggle-notifications');
         const toggleBg = document.getElementById('toggle-bg');
         const toggleLabel = document.getElementById('toggle-label');
@@ -254,20 +242,17 @@
       }
     });
 
-    // Функция склонения
     function plural(n, one, two, many) {
       if (n % 10 === 1 && n % 100 !== 11) return one;
       if (n % 10 >= 2 && n % 10 <= 4 && (n % 100 < 10 || n % 100 >= 20)) return two;
       return many;
     }
 
-    // Формат времени
     function formatDateTime(dateStr) {
       const date = new Date(dateStr);
       return date.toLocaleTimeString('ru', { hour: '2-digit', minute: '2-digit' });
     }
 
-    // Иконки для активности
     function getIconClass(icon) {
       switch (icon) {
         case 'check': return 'check-circle text-green-500';
@@ -278,6 +263,17 @@
         default: return 'circle text-gray-400';
       }
     }
+    // === Липкий хедер с анимацией ===
+  const headerWrapper = document.querySelector('.header-wrapper');
+  const headerContainer = document.querySelector('.header-container');
+
+  window.addEventListener('scroll', () => {
+    if (window.scrollY > 100) {
+      headerWrapper.classList.add('sticky');
+    } else {
+      headerWrapper.classList.remove('sticky');
+    }
+  });
   </script>
 </body>
 </html>

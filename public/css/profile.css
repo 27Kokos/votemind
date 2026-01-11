@@ -1,25 +1,14 @@
-/* Большая аватарка в профиле */
-.avatar-large {
-  width: 120px;
-  height: 120px;
-  border: 3px solid white;
-  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.1);
-  transition: transform 0.3s;
-  margin-bottom: 20px;
-}
-
-.avatar-large:hover {
-  transform: scale(1.06);
-}
-
-
-/* Карточки */
+/* Карточки — liquid glass */
 .card {
-  background: white;
+  background: rgba(26, 26, 46, 0.4);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  border: 1px solid rgba(139, 92, 246, 0.2);
   border-radius: 20px;
-  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.06);
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.25);
   transition: all 0.3s ease;
   overflow: hidden;
+  padding: 24px;
   opacity: 0;
   transform: translateY(20px);
 }
@@ -31,15 +20,35 @@
 
 .card:hover {
   transform: translateY(-6px);
-  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.08);
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
+  border-color: rgba(168, 85, 247, 0.4);
 }
 
-/* Заголовки секций */
+/* Аватарка */
+.avatar-large {
+  width: 120px;
+  height: 120px;
+  border: 3px solid rgba(139, 92, 246, 0.3);
+  border-radius: 50%;
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.3);
+  transition: transform 0.3s;
+  margin: 0 auto 20px;
+}
+
+.avatar-large:hover {
+  transform: scale(1.06);
+  border-color: #8b5cf6;
+}
+
+/* Заголовки */
 .section-title {
   font-size: 1.25rem;
   font-weight: 600;
-  color: #1e293b;
+  color: #c4b5fd;
   margin-bottom: 1.5rem;
+  display: flex;
+  align-items: center;
+  gap: 10px;
   position: relative;
 }
 
@@ -49,12 +58,42 @@
   left: 0;
   bottom: -8px;
   width: 40px;
-  height: 3px;
-  background: linear-gradient(90deg, #7c3aed, #8b5cf6);
+  height: 2px;
+  background: linear-gradient(90deg, #7c3aed, #a78bfa);
   border-radius: 2px;
 }
 
-/* Переключатель (toggle) */
+/* Активность */
+.activity-item {
+  display: flex;
+  gap: 12px;
+  padding: 10px 0;
+  border-bottom: 1px solid rgba(139, 92, 246, 0.1);
+  transition: background 0.2s;
+}
+
+.activity-item:hover {
+  background: rgba(139, 92, 246, 0.05);
+  border-radius: 6px;
+  padding-left: 10px;
+}
+
+.activity-icon {
+  color: #a78bfa;
+}
+
+.activity-text {
+  font-size: 0.95rem;
+  font-weight: 500;
+  color: #f3f4f6;
+}
+
+.activity-time {
+  font-size: 0.75rem;
+  color: #9fa6c4;
+}
+
+/* Тумблер */
 .toggle-switch {
   position: relative;
   display: inline-block;
@@ -75,10 +114,10 @@
   left: 0;
   right: 0;
   bottom: 0;
-  background-color: #e2e8f0;
+  background-color: #374151;
   border-radius: 30px;
   transition: 0.3s;
-  box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.1);
+  box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.2);
 }
 
 .toggle-bg::before {
@@ -91,54 +130,21 @@
   background: white;
   border-radius: 50%;
   transition: 0.3s;
-  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.1);
 }
 
 input:checked + .toggle-bg {
-  background: linear-gradient(90deg, #7c3aed, #8b5cf6);
+  background: linear-gradient(90deg, #7c3aed, #a78bfa);
 }
 
 input:checked + .toggle-bg::before {
   transform: translateX(22px);
 }
 
-/* Активность */
-.activity-item {
-  display: flex;
-  gap: 14px;
-  padding: 12px 0;
-  border-bottom: 1px solid rgba(124, 58, 237, 0.1);
-  transition: background 0.2s;
-}
-
-.activity-item:hover {
-  background: rgba(124, 58, 237, 0.04);
-  border-radius: 8px;
-  padding-left: 12px;
-}
-
-.activity-icon {
-  font-size: 1.2rem;
-  margin-top: 2px;
-  color: #7c3aed;
-}
-
-.activity-text {
-  font-size: 0.95rem;
-  font-weight: 500;
-  color: #1e293b;
-}
-
-.activity-time {
-  font-size: 0.75rem;
-  color: #64748b;
-}
-
-/* Кнопка с glass-эффектом */
+/* Кнопка */
 .glass-btn {
-  background: rgba(124, 58, 237, 0.12);
-  border: 1px solid rgba(255, 255, 255, 0.4);
-  color: #7c3aed;
+  background: rgba(109, 40, 217, 0.2);
+  border: 1px solid rgba(168, 85, 247, 0.3);
+  color: #d8b4fe;
   font-weight: 600;
   font-size: 0.95rem;
   padding: 0.75rem 1.5rem;
@@ -148,16 +154,11 @@ input:checked + .toggle-bg::before {
   display: inline-flex;
   align-items: center;
   gap: 8px;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
 }
 
 .glass-btn:hover {
-  background: rgba(124, 58, 237, 0.22);
+  background: rgba(139, 92, 246, 0.3);
   transform: scale(1.04);
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
-}
-
-/* Отступ под хедер */
-.spacer {
-  height: 80px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
 }
