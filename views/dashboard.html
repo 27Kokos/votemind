@@ -1,0 +1,232 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Кабинет — VoteMind</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"/>
+  <style>
+    .notification-item {
+      @apply p-3 hover:bg-gray-50 cursor-pointer border-l-4 border-transparent;
+    }
+    .notification-item.unread {
+      @apply border-blue-500 bg-blue-50;
+    }
+    .proposal-item {
+      @apply p-3 border-b hover:bg-gray-50 cursor-pointer;
+    }
+  </style>
+</head>
+<body class="bg-gray-100 min-h-screen">
+
+  <!-- Хедер -->
+  <header class="bg-white shadow-sm">
+    <div class="container mx-auto px-4 py-3 flex justify-between items-center">
+      <a href="/" class="text-2xl font-bold text-gray-800">VoteMind</a>
+      <div class="flex items-center space-x-6">
+        <!-- Уведомления -->
+        <a href="#" class="text-gray-600 hover:text-gray-900 relative" onclick="toggleNotifications(event)">
+          <i class="fas fa-bell text-lg"></i>
+          <span id="notification-badge" class="absolute -top-1 -right-1 bg-red-500 text-white text-xs rounded-full w-4 h-4 flex items-center justify-center hidden">0</span>
+        </a>
+        <a href="/profile" class="text-gray-600 hover:text-gray-900">
+          <i class="fas fa-user text-lg"></i>
+        </a>
+        <a href="/auth/logout" class="text-red-600 hover:text-red-800 text-sm">Выйти</a>
+      </div>
+    </div>
+
+    <!-- Меню уведомлений -->
+    <div id="notifications-menu" class="hidden absolute top-12 right-4 bg-white border rounded-lg shadow-lg w-80 max-h-96 overflow-y-auto z-50">
+      <div class="p-3 border-b text-sm font-medium text-gray-700">Уведомления</div>
+      <div id="notifications-list" class="divide-y">
+        <div class="p-3 text-gray-500 text-sm">Загрузка...</div>
+      </div>
+    </div>
+  </header>
+
+  <!-- Контент -->
+  <main class="container mx-auto px-4 py-6">
+    <section class="bg-white p-6 rounded-lg shadow mb-8">
+      <h2 class="text-xl font-semibold mb-4">Создать комнату</h2>
+      <form action="/rooms" method="POST">
+        <div class="mb-4">
+          <label class="block text-gray-700 mb-2">Название</label>
+          <input type="text" name="name" placeholder="Например: Моя группа" class="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring focus:ring-blue-200" required />
+        </div>
+        <div class="mb-4">
+          <label class="block text-gray-700 mb-2">Описание (опционально)</label>
+          <textarea name="description" rows="3" placeholder="Что это за комната?" class="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring focus:ring-blue-200"></textarea>
+        </div>
+        <button type="submit" class="bg-green-600 text-white font-bold py-2 px-6 rounded-lg hover:bg-green-700 transition">Создать</button>
+      </form>
+    </section>
+
+    <section class="bg-white p-6 rounded-lg shadow mb-8">
+      <h2 class="text-xl font-semibold mb-4">Присоединиться к комнате</h2>
+      <form action="/rooms/join" method="POST">
+        <div class="mb-4">
+          <label class="block text-gray-700 mb-2">Код приглашения</label>
+          <input type="text" name="inviteCode" maxlength="6" placeholder="Например: AB12CD" class="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring focus:ring-blue-200" required />
+        </div>
+        <button type="submit" class="bg-blue-600 text-white font-bold py-2 px-6 rounded-lg hover:bg-blue-700 transition">Присоединиться</button>
+      </form>
+    </section>
+
+    <section>
+      <h2 class="text-xl font-semibold mb-4">Мои комнаты</h2>
+      <div id="rooms-list" class="space-y-4">
+        <p class="text-gray-500">Пока нет комнат. Создайте первую!</p>
+      </div>
+    </section>
+
+    <!-- Кнопка управления предложениями -->
+    <div class="mt-6">
+      <button onclick="openProposalsModal()" class="bg-purple-600 text-white font-bold py-2 px-4 rounded-lg hover:bg-purple-700">
+        🔍 Просмотреть предложения
+      </button>
+    </div>
+
+    <!-- Модальное окно: предложения -->
+    <div id="proposals-modal" class="hidden fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+      <div class="bg-white p-6 rounded-lg shadow-lg max-w-lg w-full max-h-96 overflow-y-auto">
+        <div class="flex justify-between items-center mb-4">
+          <h2 class="text-xl font-semibold">Новые предложения</h2>
+          <button onclick="closeProposalsModal()" class="text-gray-500 hover:text-gray-700 text-2xl">&times;</button>
+        </div>
+        <div id="proposals-list">
+          <p class="text-gray-500">Загрузка...</p>
+        </div>
+      </div>
+    </div>
+
+    <script>
+      async function loadRooms() {
+        try {
+          const response = await fetch('/rooms/my');
+          const rooms = await response.json();
+          const container = document.getElementById('rooms-list');
+          container.innerHTML = '';
+
+          if (rooms.length === 0) {
+            container.innerHTML = '<p class="text-gray-500">Пока нет комнат. Создайте первую!</p>';
+            return;
+          }
+
+          rooms.forEach(room => {
+            const role = room.is_owner ? 'Владелец' : 'Участник';
+            const card = `
+              <a href="/room/${room.id}" class="block bg-white border rounded-lg p-4 shadow hover:shadow-md transition">
+                <div class="flex justify-between">
+                  <div>
+                    <h3 class="text-lg font-semibold">${room.name}</h3>
+                    <p class="text-gray-600">${room.description || 'Без описания'}</p>
+                    <div class="text-sm text-gray-500 mt-1">Код: <strong>${room.invite_code}</strong></div>
+                  </div>
+                  <div class="text-right">
+                    <span class="text-xs bg-blue-100 text-blue-800 px-2 py-1 rounded-full">${role}</span>
+                  </div>
+                </div>
+              </a>
+            `;
+            container.insertAdjacentHTML('beforeend', card);
+          });
+        } catch (err) {
+          console.error('Ошибка загрузки комнат:', err);
+        }
+      }
+
+      // Загрузка предложений
+      async function loadProposals() {
+        const list = document.getElementById('proposals-list');
+        list.innerHTML = '<p class="text-gray-500">Загрузка...</p>';
+
+        try {
+          const rooms = await fetch('/rooms/my').then(r => r.json());
+          const ownerRoomIds = rooms.filter(r => r.is_owner).map(r => r.id);
+
+          if (ownerRoomIds.length === 0) {
+            list.innerHTML = '<p class="text-gray-500">Вы не владеете комнатами</p>';
+            return;
+          }
+
+          const allProposals = [];
+          for (const roomId of ownerRoomIds) {
+            const res = await fetch(`/proposals/room/${roomId}`);
+            if (res.ok) {
+              const proposals = await res.json();
+              allProposals.push(...proposals);
+            }
+          }
+
+          if (allProposals.length === 0) {
+            list.innerHTML = '<p class="text-gray-500">Нет нерассмотренных предложений</p>';
+            return;
+          }
+
+          list.innerHTML = '';
+          allProposals.forEach(p => {
+            const item = document.createElement('div');
+            item.className = 'proposal-item border-b last:border-b-0';
+            item.innerHTML = `
+              <div class="font-medium">${p.question}</div>
+              <div class="text-sm text-gray-600">от @${p.username} в "${p.room_name}"</div>
+              <div class="mt-2 space-x-2">
+                <button onclick="approveProposal(${p.id})" class="text-xs bg-green-100 text-green-800 px-2 py-1 rounded hover:bg-green-200">✅ Одобрить</button>
+                <button onclick="rejectProposal(${p.id}, this)" class="text-xs bg-red-100 text-red-800 px-2 py-1 rounded hover:bg-red-200">❌ Отклонить</button>
+              </div>
+            `;
+            list.appendChild(item);
+          });
+        } catch (err) {
+          list.innerHTML = '<p class="text-red-500">Ошибка загрузки</p>';
+          console.error(err);
+        }
+      }
+
+      async function approveProposal(id) {
+        const res = await fetch(`/proposals/approve/${id}`, { method: 'POST' });
+        if (res.ok) {
+          alert('Одобрено! Голосование создано.');
+          loadProposals();
+          fetchGlobalNotifications(); // Обновим колокольчик
+        } else {
+          alert('Ошибка при одобрении');
+        }
+      }
+
+      function rejectProposal(id, btn) {
+        if (!confirm('Отклонить предложение?')) return;
+        fetch(`/proposals/reject/${id}`, { method: 'POST' })
+          .then(() => {
+            btn.closest('.proposal-item').remove();
+          })
+          .catch(() => alert('Ошибка'));
+      }
+
+      function openProposalsModal() {
+        document.getElementById('proposals-modal').classList.remove('hidden');
+        loadProposals();
+      }
+
+      function closeProposalsModal() {
+        document.getElementById('proposals-modal').classList.add('hidden');
+      }
+
+      document.addEventListener('DOMContentLoaded', () => {
+        loadRooms();
+        if (document.getElementById('notification-badge')) {
+          fetchGlobalNotifications();
+          setInterval(fetchGlobalNotifications, 10000);
+        }
+      });
+    </script>
+    <script src="/js/notifications.js"></script>
+  </main>
+
+  <footer class="mt-12 text-center text-gray-500 text-sm">
+    &copy; 2025 VoteMind — Просто. Быстро. Совместно.
+  </footer>
+</body>
+</html>

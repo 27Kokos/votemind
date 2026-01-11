@@ -1,0 +1,38 @@
+<!-- views/layout.ejs -->
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title><%= title || 'VoteMind' %> — VoteMind</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"/>
+</head>
+<body class="bg-gray-100 min-h-screen">
+  <!-- Хедер -->
+  <header class="bg-white shadow-sm">
+    <div class="container mx-auto px-4 py-3 flex justify-between items-center">
+      <a href="/" class="text-2xl font-bold text-gray-800">VoteMind</a>
+      <div class="flex items-center space-x-6">
+        <a href="/notifications" class="text-gray-600 hover:text-gray-900 relative">
+          <i class="fas fa-bell text-lg"></i>
+          <span id="notification-badge" class="absolute -top-1 -right-1 bg-red-500 text-white text-xs rounded-full w-4 h-4 flex items-center justify-center">0</span>
+        </a>
+        <a href="/profile" class="text-gray-600 hover:text-gray-900">
+          <i class="fas fa-user text-lg"></i>
+        </a>
+        <a href="/auth/logout" class="text-red-600 hover:text-red-800 text-sm">Выйти</a>
+      </div>
+    </div>
+  </header>
+
+  <!-- Основной контент -->
+  <main class="container mx-auto px-4 py-6">
+    <%- body %>
+  </main>
+
+  <footer class="mt-12 text-center text-gray-500 text-sm">
+    &copy; 2025 VoteMind — Просто. Быстро. Совместно.
+  </footer>
+</body>
+</html>

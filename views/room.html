@@ -1,0 +1,228 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Комната — VoteMind</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"/>
+  <style>
+    .notification-item {
+      @apply p-3 hover:bg-gray-50 cursor-pointer border-l-4 border-transparent;
+    }
+    .notification-item.unread {
+      @apply border-blue-500 bg-blue-50;
+    }
+    .notification-item:hover {
+      @apply bg-gray-50;
+    }
+    .proposal-item {
+      @apply p-3 border-b hover:bg-gray-50 cursor-pointer;
+    }
+  </style>
+</head>
+<body class="bg-gray-100 min-h-screen">
+
+  <!-- Хедер -->
+  <header class="bg-white shadow-sm">
+    <div class="container mx-auto px-4 py-3 flex justify-between items-center">
+      <a href="/" class="text-2xl font-bold text-gray-800">VoteMind</a>
+      <div class="flex items-center space-x-6">
+        <!-- Уведомления -->
+        <a href="#" class="text-gray-600 hover:text-gray-900 relative" onclick="toggleNotifications(event)">
+          <i class="fas fa-bell text-lg"></i>
+          <span id="notification-badge" class="absolute -top-1 -right-1 bg-red-500 text-white text-xs rounded-full w-4 h-4 flex items-center justify-center hidden">0</span>
+        </a>
+        <a href="/profile" class="text-gray-600 hover:text-gray-900">
+          <i class="fas fa-user text-lg"></i>
+        </a>
+        <a href="/auth/logout" class="text-red-600 hover:text-red-800 text-sm">Выйти</a>
+      </div>
+    </div>
+
+    <!-- Меню уведомлений -->
+    <div id="notifications-menu" class="hidden absolute top-12 right-4 bg-white border rounded-lg shadow-lg w-80 max-h-96 overflow-y-auto z-50">
+      <div class="p-3 border-b text-sm font-medium text-gray-700">Уведомления</div>
+      <div id="notifications-list" class="divide-y">
+        <div class="p-3 text-gray-500 text-sm">Загрузка...</div>
+      </div>
+    </div>
+  </header>
+
+  <!-- Контент -->
+  <main class="container mx-auto px-4 py-6">
+    <div class="bg-white p-6 rounded-lg shadow mb-6">
+      <h2 class="text-2xl font-semibold" id="room-name">Загрузка...</h2>
+      <p class="text-gray-600 mt-1" id="room-desc"></p>
+      <p class="text-sm text-gray-500 mt-1">Код: <strong id="room-code"></strong></p>
+    </div>
+
+    <div class="mb-4">
+      <a href="/dashboard" class="text-blue-600 hover:underline text-sm flex items-center">
+        ← Назад в кабинет
+      </a>
+    </div>
+
+    <div id="polls-list" class="space-y-4"></div>
+
+    <div id="create-poll-button" class="mt-6 hidden">
+      <button onclick="openCreatePollModal()" class="bg-green-600 text-white font-bold py-2 px-4 rounded-lg hover:bg-green-700">
+        + Создать голосование
+      </button>
+    </div>
+
+    <div id="propose-poll-button" class="mt-6 hidden">
+      <button onclick="openProposeModal()" class="bg-blue-600 text-white font-bold py-2 px-4 rounded-lg hover:bg-blue-700">
+        💡 Предложить голосование
+      </button>
+    </div>
+
+    <!-- Кнопка управления предложениями -->
+    <div id="manage-proposals" class="mt-6 hidden">
+      <button onclick="openProposalsModal()" class="bg-purple-600 text-white font-bold py-2 px-4 rounded-lg hover:bg-purple-700">
+        🔍 Просмотреть предложения
+      </button>
+    </div>
+
+    <!-- Модальное окно: просмотр предложения -->
+    <div id="proposal-modal" class="hidden fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+      <div class="bg-white p-6 rounded-lg shadow-lg max-w-lg w-full max-h-96 overflow-y-auto">
+        <div class="flex justify-between items-center mb-4">
+          <h2 class="text-xl font-semibold">Предложение</h2>
+          <button onclick="closeProposalModal()" class="text-gray-500 hover:text-gray-700 text-2xl">&times;</button>
+        </div>
+        <div id="proposal-content">
+          <p>Загрузка...</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Модальное окно: предложить голосование -->
+    <div id="propose-modal" class="hidden fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+      <div class="bg-white p-6 rounded-lg shadow-lg max-w-lg w-full">
+        <div class="flex justify-between items-center mb-4">
+          <h2 class="text-xl font-semibold">Предложить голосование</h2>
+          <button onclick="closeProposeModal()" class="text-gray-500 hover:text-gray-700 text-2xl">&times;</button>
+        </div>
+        <form id="propose-form">
+          <input type="hidden" id="propose-room-id" value="" />
+          <div class="mb-4">
+            <label class="block text-gray-700 mb-2">Вопрос</label>
+            <input type="text" id="propose-question" class="w-full px-3 py-2 border rounded-lg" required />
+          </div>
+          <div class="mb-4">
+            <label class="block text-gray-700 mb-2">Тип</label>
+            <select id="propose-type" class="w-full px-3 py-2 border rounded-lg">
+              <option value="single">Один вариант</option>
+              <option value="multiple">Несколько</option>
+              <option value="rated_options">Оценить каждый (1–5)</option>
+            </select>
+          </div>
+          <div class="mb-4">
+            <label class="block text-gray-700 mb-2">Варианты</label>
+            <div id="propose-options">
+              <input type="text" class="w-full px-3 py-2 border rounded-lg mb-2" placeholder="Вариант 1" required>
+              <input type="text" class="w-full px-3 py-2 border rounded-lg mb-2" placeholder="Вариант 2" required>
+            </div>
+            <button type="button" onclick="addProposeOption()" class="text-sm text-blue-600 hover:underline">+ Добавить</button>
+          </div>
+          <div class="flex space-x-2">
+            <button type="submit" class="bg-blue-600 text-white py-2 px-4 rounded">Отправить</button>
+            <button type="button" onclick="closeProposeModal()" class="bg-gray-300 text-gray-700 py-2 px-4 rounded">Отмена</button>
+          </div>
+        </form>
+      </div>
+    </div>
+
+    <!-- Модальное окно: просмотр голосования -->
+    <div id="poll-modal" class="hidden fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+      <div class="bg-white p-6 rounded-lg shadow-lg max-w-lg w-full max-h-96 overflow-y-auto">
+        <div class="flex justify-between items-center mb-4">
+          <button onclick="closePollModal()" class="text-gray-500 hover:text-gray-700">&larr; Назад</button>
+          <h2 class="text-xl font-semibold">Голосование</h2>
+          <button onclick="closePollModal()" class="text-gray-500 hover:text-gray-700">&times;</button>
+        </div>
+        <div id="poll-content"></div>
+      </div>
+    </div>
+
+    <!-- Модальное окно: редактирование -->
+    <div id="edit-poll-modal" class="hidden fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+      <div class="bg-white p-6 rounded-lg shadow-lg max-w-lg w-full">
+        <div class="flex justify-between items-center mb-4">
+          <h2 class="text-xl font-semibold">Редактировать голосование</h2>
+          <button onclick="closeEditPollModal()" class="text-gray-500 hover:text-gray-700 text-2xl">&times;</button>
+        </div>
+        <form id="edit-poll-form">
+          <input type="hidden" id="edit-poll-id" value="" />
+          <div class="mb-4">
+            <label class="block text-gray-700 mb-2">Вопрос</label>
+            <input type="text" id="edit-poll-question" class="w-full px-3 py-2 border rounded-lg" required />
+          </div>
+          <div class="mb-4">
+            <label class="block text-gray-700 mb-2">Тип</label>
+            <select id="edit-poll-type" class="w-full px-3 py-2 border rounded-lg" disabled>
+              <option value="single">Один вариант</option>
+              <option value="multiple">Несколько</option>
+              <option value="rated_options">Оценить каждый (1–5)</option>
+            </select>
+            <p class="text-xs text-gray-500 mt-1">Тип нельзя изменить после создания.</p>
+          </div>
+          <div id="edit-options-container" class="mb-4">
+            <label class="block text-gray-700 mb-2">Варианты</label>
+            <div id="edit-options-inputs"></div>
+            <button type="button" onclick="addEditOption()" class="text-sm text-blue-600 hover:underline">+ Добавить вариант</button>
+          </div>
+          <div class="flex space-x-2">
+            <button type="submit" class="bg-blue-600 text-white font-bold py-2 px-4 rounded-lg">Сохранить</button>
+            <button type="button" onclick="closeEditPollModal()" class="bg-gray-300 text-gray-700 font-bold py-2 px-4 rounded-lg">Отмена</button>
+          </div>
+        </form>
+      </div>
+    </div>
+
+    <!-- Модальное окно: создание голосования -->
+    <div id="create-poll-modal" class="hidden fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+      <div class="bg-white p-6 rounded-lg shadow-lg max-w-lg w-full">
+        <div class="flex justify-between items-center mb-4">
+          <h2 class="text-xl font-semibold">Новое голосование</h2>
+          <button onclick="closeCreatePollModal()" class="text-gray-500 hover:text-gray-700 text-2xl">&times;</button>
+        </div>
+        <form id="create-poll-modal-form">
+          <div class="mb-4">
+            <label class="block text-gray-700 mb-2">Вопрос</label>
+            <input type="text" id="poll-question" class="w-full px-3 py-2 border rounded-lg" placeholder="Что вы думаете по поводу..." required />
+          </div>
+          <div class="mb-4">
+            <label class="block text-gray-700 mb-2">Тип голосования</label>
+            <select id="poll-type" class="w-full px-3 py-2 border rounded-lg" onchange="updateOptionsVisibility()">
+              <option value="single">Один вариант</option>
+              <option value="multiple">Несколько</option>
+              <option value="rated_options">Оценить каждый вариант (1–5)</option>
+            </select>
+          </div>
+          <div id="options-container" class="mb-4">
+            <label class="block text-gray-700 mb-2">Варианты</label>
+            <div id="options-inputs">
+              <input type="text" class="option-input w-full px-3 py-2 border rounded-lg mb-2" placeholder="Вариант 1" required />
+              <input type="text" class="option-input w-full px-3 py-2 border rounded-lg mb-2" placeholder="Вариант 2" required />
+            </div>
+            <button type="button" onclick="addOption()" class="text-sm text-blue-600 hover:underline">+ Добавить вариант</button>
+          </div>
+          <div class="flex space-x-2">
+            <button type="submit" class="bg-blue-600 text-white font-bold py-2 px-4 rounded-lg">Создать</button>
+            <button type="button" onclick="closeCreatePollModal()" class="bg-gray-300 text-gray-700 font-bold py-2 px-4 rounded-lg">Отмена</button>
+          </div>
+        </form>
+      </div>
+    </div>
+
+     <script src="/js/room.js"></script>
+    <script src="/js/notifications.js"></script>
+  </main>
+
+  <footer class="mt-12 text-center text-gray-500 text-sm">
+    &copy; 2025 VoteMind — Просто. Быстро. Совместно.
+  </footer>
+</body>
+</html>

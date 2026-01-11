@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Регистрация — VoteMind</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gray-100 flex items-center justify-center min-h-screen">
+  <div class="bg-white p-8 rounded-lg shadow-md w-full max-w-sm">
+    <h2 class="text-2xl font-bold mb-6 text-center">Регистрация</h2>
+    <form action="/auth/register" method="POST">
+      <div class="mb-4">
+        <label class="block text-gray-700 text-sm font-bold mb-2">Никнейм</label>
+        <input
+          name="username"
+          class="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring focus:ring-blue-200"
+          required
+        />
+      </div>
+      <div class="mb-4">
+        <label class="block text-gray-700 text-sm font-bold mb-2">Email</label>
+        <input
+          type="email"
+          name="email"
+          class="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring focus:ring-blue-200"
+          required
+        />
+      </div>
+      <div class="mb-6">
+        <label class="block text-gray-700 text-sm font-bold mb-2">Пароль</label>
+        <input
+          type="password"
+          name="password"
+          class="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring focus:ring-blue-200"
+          required
+        />
+      </div>
+      <button
+        type="submit"
+        class="w-full bg-green-600 text-white font-bold py-2 px-4 rounded-lg hover:bg-green-700 transition"
+      >
+        Зарегистрироваться
+      </button>
+    </form>
+    <p class="mt-4 text-center text-sm">
+      Уже есть аккаунт?
+      <a href="/login" class="text-blue-600 hover:underline">Войти</a>
+    </p>
+  </div>
+</body>
+</html>
