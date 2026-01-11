@@ -139,4 +139,6 @@ document.addEventListener('DOMContentLoaded', async () => {
   } catch (err) {
     console.error('Ошибка инициализации:', err);
   }
+  window.toggleNotifications = toggleNotifications;
+
 });

@@ -1,0 +1,43 @@
+/* Обёртка хедера — контекст для позиционирования */
+.header-wrapper {
+  position: relative;
+}
+
+#notifications-menu {
+  position: absolute;
+  top: 60px; /* под хедер */
+  right: 0;   /* выравниваем по правому краю хедера */
+  width: 320px;
+  max-width: calc(100vw - 1rem);
+  border-radius: 18px;
+  overflow: hidden;
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.12);
+  opacity: 0;
+  visibility: hidden;
+  transition: all 0.3s ease;
+  transform: translateY(-10px);
+  z-index: 50;
+  background: white;
+}
+
+#notifications-menu:not(.hidden) {
+  opacity: 1;
+  visibility: visible;
+  transform: translateY(0);
+}
+
+.notification-item {
+  padding: 12px 16px;
+  border-bottom: 1px solid rgba(124, 58, 237, 0.1);
+  cursor: pointer;
+  transition: background 0.2s;
+}
+
+.notification-item:hover {
+  background: rgba(124, 58, 237, 0.05);
+}
+
+.notification-item.unread {
+  background: rgba(124, 58, 237, 0.08);
+  font-weight: 500;
+}

@@ -4,120 +4,172 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Профиль — VoteMind</title>
+  <!-- Tailwind CSS -->
   <script src="https://cdn.tailwindcss.com"></script>
+  <!-- Font Awesome -->
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"/>
+  <!-- Шрифт -->
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <!-- Подключаем наши CSS -->
+  <link rel="stylesheet" href="/css/main.css">
+  <link rel="stylesheet" href="/css/header.css">
+  <link rel="stylesheet" href="/css/profile.css">
+  <link rel="stylesheet" href="/css/notifications.css">
 </head>
-<body class="bg-gray-100 min-h-screen">
+<body class="min-h-screen bg-gradient-to-br from-blue-50 via-indigo-50 to-purple-50">
 
   <!-- Хедер -->
-  <header class="bg-white shadow-sm">
-    <div class="container mx-auto px-4 py-3 flex justify-between items-center">
-      <a href="/dashboard" class="text-2xl font-bold text-gray-800">VoteMind</a>
-      <div class="flex items-center space-x-6">
-        <a href="#" class="text-gray-600 hover:text-gray-900 relative" onclick="toggleNotifications(event)">
-          <i class="fas fa-bell text-lg"></i>
-          <span id="notification-badge" class="absolute -top-1 -right-1 bg-red-500 text-white text-xs rounded-full w-4 h-4 flex items-center justify-center hidden">0</span>
-        </a>
-        <a href="/profile" class="flex items-center">
-          <img id="header-avatar" src="/img/default-avatar.png" class="w-8 h-8 rounded-full border hover:ring-2 hover:ring-blue-400 transition" alt="Профиль" title="Перейти в профиль">
-        </a>
-        <a href="/auth/logout" class="text-red-600 hover:text-red-800 text-sm">Выйти</a>
+  <header class="fixed top-4 left-1/2 transform -translate-x-1/2 z-50">
+    <div class="header-wrapper relative">
+      <div class="glass header-container w-max max-w-[90vw] rounded-2xl shadow-lg">
+        <a href="/dashboard" class="font-bold text-indigo-700 hover:bg-indigo-50 px-3 py-2 rounded-lg">VoteMind</a>
+        <div class="flex items-center space-x-3">
+          <!-- Колокольчик -->
+          <a href="#" class="relative" onclick="window.toggleNotifications(event)">
+            <i class="fas fa-bell text-base text-gray-600 hover:text-indigo-600"></i>
+            <span id="notification-badge"
+                  class="hidden absolute -top-1 -right-1 bg-indigo-600 text-white text-xs rounded-full w-4 h-4 flex items-center justify-center">0</span>
+          </a>
+          <!-- Профиль -->
+          <a href="/profile" class="flex items-center space-x-2 hover:bg-gray-100 px-2 py-1 rounded-lg">
+            <img id="header-avatar" src="/img/default-avatar.png" class="avatar rounded-full" alt="Профиль">
+            <span class="text-xs font-medium text-gray-700">Профиль</span>
+          </a>
+          <!-- Выйти -->
+          <a href="/auth/logout" class="text-xs text-red-600 hover:text-red-800">Выйти</a>
+        </div>
       </div>
-    </div>
 
-    <!-- Меню уведомлений -->
-    <div id="notifications-menu" class="hidden absolute top-12 right-4 bg-white border rounded-lg shadow-lg w-80 max-h-96 overflow-y-auto z-50">
-      <div class="p-3 border-b text-sm font-medium text-gray-700">Уведомления</div>
-      <div id="notifications-list" class="divide-y">
-        <div class="p-3 text-gray-500 text-sm">Загрузка...</div>
+      <!-- Меню уведомлений — внутри header-wrapper -->
+      <div id="notifications-menu" class="glass hidden w-80 rounded-xl shadow-xl z-50 overflow-hidden">
+        <div class="p-3 border-b border-white/30 text-sm font-medium text-gray-700">Уведомления</div>
+        <div id="notifications-list">
+          <div class="p-3 text-gray-500 text-sm">Загрузка...</div>
+        </div>
       </div>
     </div>
   </header>
 
-  <!-- Контент -->
-  <main class="container mx-auto px-4 py-6">
-    <div class="bg-white p-8 rounded-lg shadow max-w-lg mx-auto">
-      <h1 class="text-2xl font-semibold mb-6 text-center">Ваш профиль</h1>
+  <!-- Отступ под хедер -->
+  <div class="spacer h-16"></div>
 
-      <!-- Аватар -->
-      <div class="flex flex-col items-center mb-6">
-        <img id="current-avatar" src="/img/default-avatar.png" class="w-24 h-24 rounded-full border mb-4" alt="Аватар">
-        <form id="avatar-form" action="/profile/avatar" method="POST" enctype="multipart/form-data">
-          <label class="bg-blue-600 text-white py-2 px-4 rounded-lg cursor-pointer hover:bg-blue-700 text-sm">
-            🖼️ Изменить фото
-            <input type="file" name="avatar" accept="image/*" class="hidden" onchange="this.form.submit()">
-          </label>
-        </form>
+  <!-- Контент -->
+  <main class="container mx-auto px-8 py-12">
+    <div class="max-w-3xl mx-auto">
+      <!-- Карточка профиля -->
+      <div class="card p-8 mb-8 text-center">
+        <img id="current-avatar" src="/img/default-avatar.png" class="avatar-large rounded-full mx-auto mb-6" alt="Аватар">
+        <h1 class="text-3xl font-bold text-gray-900 mb-2">Ваш профиль</h1>
+        <p class="text-gray-600">Персональная статистика и активность</p>
       </div>
 
-      <!-- Статистика -->
-      <div class="bg-gray-50 p-6 rounded-lg mb-6">
-        <h2 class="text-lg font-semibold mb-4 text-gray-800">📊 Ваша статистика</h2>
-        <div class="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
-          <div class="flex justify-between">
-            <span class="text-gray-600">Предложено:</span>
-            <span class="font-medium" id="total-proposals">—</span>
+      <!-- Инфо и статистика -->
+      <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-8">
+        <!-- Основная информация -->
+        <div class="lg:col-span-1 card p-6">
+          <h3 class="section-title">
+            <i class="fas fa-user text-indigo-600 mr-2"></i>Личные данные
+          </h3>
+          <div class="space-y-4 text-sm">
+            <div class="flex justify-between">
+              <span class="text-gray-600">Имя пользователя</span>
+              <span class="font-medium" id="username">—</span>
+            </div>
+            <div class="flex justify-between">
+              <span class="text-gray-600">Дата регистрации</span>
+              <span class="font-medium" id="created-at">—</span>
+            </div>
           </div>
-          <div class="flex justify-between">
-            <span class="text-gray-600">Одобрено:</span>
-            <span class="font-medium" id="approved-proposals">—</span>
+        </div>
+
+        <!-- Статистика -->
+        <div class="lg:col-span-2 card p-6">
+          <h3 class="section-title">
+            <i class="fas fa-chart-bar text-indigo-600 mr-2"></i>Статистика
+          </h3>
+          <div class="grid grid-cols-2 gap-4 text-sm">
+            <div class="flex justify-between">
+              <span class="text-gray-600">Предложено</span>
+              <span class="font-medium" id="total-proposals">—</span>
+            </div>
+            <div class="flex justify-between">
+              <span class="text-gray-600">Одобрено</span>
+              <span class="font-medium" id="approved-proposals">—</span>
+            </div>
+            <div class="flex justify-between">
+              <span class="text-gray-600">Проголосовал</span>
+              <span class="font-medium" id="total-votes">—</span>
+            </div>
+            <div class="flex justify-between">
+              <span class="text-gray-600">Комнат</span>
+              <span class="font-medium" id="total-rooms">—</span>
+            </div>
+            <div class="flex justify-between">
+              <span class="text-gray-600">Самая активная</span>
+              <span class="font-medium text-blue-600" id="active-room">—</span>
+            </div>
           </div>
-          <div class="flex justify-between">
-            <span class="text-gray-600">Проголосовал:</span>
-            <span class="font-medium" id="total-votes">—</span>
-          </div>
-          <div class="flex justify-between">
-            <span class="text-gray-600">Комнат:</span>
-            <span class="font-medium" id="total-rooms">—</span>
-          </div>
-          <div class="flex justify-between">
-            <span class="text-gray-600">Самая активная:</span>
-            <span class="font-medium text-blue-600" id="active-room">—</span>
-          </div>
+        </div>
+      </div>
+
+      <!-- История активности -->
+      <div class="card p-6 mb-8">
+        <h3 class="section-title">
+          <i class="fas fa-history text-indigo-600 mr-2"></i>История активности
+        </h3>
+        <div id="activity-list" class="space-y-3">
+          <div class="text-gray-500 text-sm">Загрузка...</div>
         </div>
       </div>
 
       <!-- Управление уведомлениями -->
-      <div class="bg-gray-50 p-6 rounded-lg mb-6">
-        <h2 class="text-lg font-semibold mb-4 text-gray-800">🔔 Уведомления</h2>
+      <div class="card p-6 mb-8">
+        <h3 class="section-title">
+          <i class="fas fa-bell text-indigo-600 mr-2"></i>Уведомления
+        </h3>
         <label class="flex items-center space-x-3 cursor-pointer">
-          <div class="relative">
-            <input type="checkbox" id="toggle-notifications" class="sr-only">
-            <div id="toggle-bg" class="w-11 h-6 bg-gray-300 rounded-full shadow-inner"></div>
-            <div id="toggle-handle" class="dot absolute w-4 h-4 bg-white rounded-full shadow -top-1 transition left-1"></div>
+          <div class="toggle-switch">
+            <input type="checkbox" id="toggle-notifications">
+            <span class="toggle-bg" id="toggle-bg"></span>
           </div>
-          <span id="toggle-label" class="text-sm font-medium text-gray-700">
-            Загрузка...
-          </span>
+          <span id="toggle-label" class="text-sm font-medium text-gray-700">Загрузка...</span>
         </label>
       </div>
 
-      <!-- История активности -->
-      <div class="bg-gray-50 p-6 rounded-lg mb-6">
-        <h2 class="text-lg font-semibold mb-4 text-gray-800">🕒 История активности</h2>
-        <div id="activity-list">
-          <p class="text-gray-500 text-sm">Загрузка...</p>
-        </div>
-      </div>
+      <!-- Кнопка изменить фото -->
+<div class="text-center">
+  <form id="avatar-form" action="/profile/avatar" method="POST" enctype="multipart/form-data" class="inline-block">
+    <label class="glass-btn cursor-pointer">
+      <i class="fas fa-upload mr-2"></i>Изменить фото
+      <input 
+        type="file" 
+        name="avatar" 
+        accept="image/*" 
+        class="hidden" 
+        onchange="this.form.submit()">
+    </label>
+  </form>
+</div>
 
-      <!-- Основная информация -->
-      <div class="space-y-4">
-        <div>
-          <label class="block text-gray-700 font-medium">Имя пользователя</label>
-          <p class="text-gray-900" id="username">—</p>
-        </div>
-        <div>
-          <label class="block text-gray-700 font-medium">Дата регистрации</label>
-          <p class="text-gray-900" id="created-at">—</p>
-        </div>
-      </div>
-    </div>
   </main>
 
-  <!-- Подключаем только notifications.js -->
+  <!-- Подключаем JS -->
   <script src="/js/notifications.js"></script>
   <script>
-    // === Загрузка данных профиля и инициализация ===
+    // === Плавное появление при скролле ===
+    const observer = new IntersectionObserver((entries) => {
+      entries.forEach(entry => {
+        if (entry.isIntersecting) {
+          entry.target.classList.add('visible');
+        }
+      });
+    }, { threshold: 0.1 });
+
+    document.querySelectorAll('.card, header').forEach(el => {
+      observer.observe(el);
+    });
+
+    // === Загрузка данных профиля ===
     document.addEventListener('DOMContentLoaded', async () => {
       try {
         const res = await fetch('/api/profile');
@@ -130,16 +182,17 @@
         document.getElementById('created-at').textContent = new Date(data.created_at).toLocaleDateString('ru');
 
         const avatarUrl = data.avatar_url || '/img/default-avatar.png';
-        document.getElementById('current-avatar').src = avatarUrl;
+        const img = document.getElementById('current-avatar');
+        img.src = avatarUrl;
+        img.onload = () => img.style.opacity = 1;
+
         document.getElementById('header-avatar').src = avatarUrl;
 
         // Статистика
         const s = data.stats;
         document.getElementById('total-proposals').textContent = s.total_proposals || 0;
-        document.getElementById('approved-proposals').textContent = 
-          `${s.approved_proposals || 0} (${s.approval_rate}%)`;
-        document.getElementById('total-votes').textContent = 
-          `${s.total_votes || 0} ${plural(s.total_votes || 0, 'раз', 'раза', 'раз')}`;
+        document.getElementById('approved-proposals').textContent = `${s.approved_proposals || 0} (${s.approval_rate}%)`;
+        document.getElementById('total-votes').textContent = `${s.total_votes || 0} ${plural(s.total_votes || 0, 'раз', 'раза', 'раз')}`;
         document.getElementById('total-rooms').textContent = s.total_rooms || 0;
         document.getElementById('active-room').textContent = s.active_room;
 
@@ -149,12 +202,14 @@
           activityList.innerHTML = '';
           data.activity.forEach(item => {
             const el = document.createElement('div');
-            el.className = 'flex items-start space-x-3 text-sm mb-3';
+            el.className = 'activity-item';
             el.innerHTML = `
-              <span class="text-lg mt-0.5">${item.icon}</span>
+              <span class="activity-icon">
+                <i class="fas fa-${getIconClass(item.icon)}"></i>
+              </span>
               <div>
-                <span class="text-gray-900">${item.text}</span>
-                <div class="text-gray-500 text-xs mt-0.5">${formatDateTime(item.time)}</div>
+                <div class="activity-text">${item.text}</div>
+                <div class="activity-time">${formatDateTime(item.time)}</div>
               </div>
             `;
             activityList.appendChild(el);
@@ -163,22 +218,15 @@
           activityList.innerHTML = '<p class="text-gray-500 text-sm">Нет активности</p>';
         }
 
-        // === Инициализация переключателя уведомлений ===
+        // Переключатель уведомлений
         const toggle = document.getElementById('toggle-notifications');
         const toggleBg = document.getElementById('toggle-bg');
-        const toggleHandle = document.getElementById('toggle-handle');
         const toggleLabel = document.getElementById('toggle-label');
-
-        // Установка текущего состояния
         const enabled = data.notifications_enabled;
         toggle.checked = enabled;
-        toggleBg.classList.toggle('bg-gray-300', !enabled);
-        toggleBg.classList.toggle('bg-green-500', enabled);
-        toggleHandle.classList.toggle('left-1', !enabled);
-        toggleHandle.classList.toggle('left-6', enabled);
+        toggleBg.style.background = enabled ? 'linear-gradient(90deg, #4f46e5, #3b82f6)' : '#e2e8f0';
         toggleLabel.textContent = enabled ? 'Уведомления включены' : 'Уведомления выключены';
 
-        // Переключение
         toggle.addEventListener('change', async () => {
           const newEnabled = toggle.checked;
           try {
@@ -189,26 +237,24 @@
             });
 
             if (res.ok) {
-              location.reload(); // Перезагружаем, чтобы обновить UI
+              location.reload();
             } else {
-              // Откатываем
               toggle.checked = !newEnabled;
-              alert('Не удалось сохранить настройку');
+              alert('Не удалось сохранить');
             }
           } catch (err) {
-            console.error(err);
             toggle.checked = !newEnabled;
-            alert('Ошибка подключения');
+            alert('Ошибка');
           }
         });
 
       } catch (err) {
-        console.error('Ошибка загрузки профиля:', err);
+        console.error('Ошибка:', err);
         alert('Не удалось загрузить данные');
       }
     });
 
-    // Функция для склонения
+    // Функция склонения
     function plural(n, one, two, many) {
       if (n % 10 === 1 && n % 100 !== 11) return one;
       if (n % 10 >= 2 && n % 10 <= 4 && (n % 100 < 10 || n % 100 >= 20)) return two;
@@ -219,6 +265,18 @@
     function formatDateTime(dateStr) {
       const date = new Date(dateStr);
       return date.toLocaleTimeString('ru', { hour: '2-digit', minute: '2-digit' });
+    }
+
+    // Иконки для активности
+    function getIconClass(icon) {
+      switch (icon) {
+        case 'check': return 'check-circle text-green-500';
+        case 'vote': return 'vote-yea text-blue-500';
+        case 'bell': return 'bell text-indigo-500';
+        case 'edit': return 'pencil-alt text-yellow-500';
+        case 'room': return 'door-open text-purple-500';
+        default: return 'circle text-gray-400';
+      }
     }
   </script>
 </body>
