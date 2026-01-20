@@ -11,6 +11,7 @@
   <link rel="stylesheet" href="/css/header.css">
   <link rel="stylesheet" href="/css/profile.css">
   <link rel="stylesheet" href="/css/notifications.css">
+  <link rel="stylesheet" href="/css/adaptive.css">
 </head>
 <body>
 
@@ -54,12 +55,12 @@
   <main class="container">
     <div class="text-center mb-8">
       <!-- Карточка профиля -->
-      <div class="card p-8">
+      <div class="card-profile visible">
         <img id="current-avatar" src="/img/default-avatar.png" class="avatar-large" alt="Аватар">
         <h1 class="text-3xl font-bold mb-2">Ваш профиль</h1>
         <p>Персональная статистика и активность</p>
       </div>
-    </div>
+
 
     <!-- Инфо и статистика -->
     <div class="profile-grid mb-8">
@@ -87,9 +88,10 @@
         </h3>
         <div class="grid-two text-sm">
           <div class="flex-between">
-            <span>Предложено</span>
-            <span class="font-medium" id="total-proposals">—</span>
+            <span><i class="fas fa-lightbulb text-indigo-400 mr-2"></i> Предложено</span>
+            <span class="font-medium" id="total-proposals">0</span>
           </div>
+
           <div class="flex-between">
             <span>Одобрено</span>
             <span class="font-medium" id="approved-proposals">—</span>
@@ -241,6 +243,25 @@
         alert('Не удалось загрузить данные');
       }
     });
+        // Плавный рост цифр (анимация счёта)
+    function animateCounter(element, target, duration = 1500) {
+      const start = 0;
+      const increment = target / (duration / 16);
+      let current = 0;
+
+      const timer = setInterval(() => {
+        current += increment;
+        if (current >= target) {
+          element.textContent = target;
+          clearInterval(timer);
+        } else {
+          element.textContent = Math.floor(current);
+        }
+      }, 16);
+    }
+
+    // Пример вызова (в DOMContentLoaded, после загрузки данных)
+    // animateCounter(document.getElementById('total-proposals'), 42);
 
     function plural(n, one, two, many) {
       if (n % 10 === 1 && n % 100 !== 11) return one;
@@ -273,6 +294,7 @@
     } else {
       headerWrapper.classList.remove('sticky');
     }
+    
   });
   </script>
 </body>

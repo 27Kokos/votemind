@@ -75,6 +75,25 @@ router.get('/my', (req, res) => {
 
   res.json(rooms);
 });
+// DELETE /rooms/:id — удалить комнату
+router.delete('/:id', (req, res) => {
+  const roomId = req.params.id;
+  const userId = req.session.userId;
+
+  const room = db.prepare('SELECT owner_id FROM rooms WHERE id = ?').get(roomId);
+  if (!room) return res.status(404).send('Комната не найдена');
+
+  if (room.owner_id !== userId) {
+    return res.status(403).send('Только владелец может удалить комнату');
+  }
+
+  // Удаляем всё, что связано с комнатой
+  db.prepare('DELETE FROM polls WHERE room_id = ?').run(roomId);
+  db.prepare('DELETE FROM poll_proposals WHERE room_id = ?').run(roomId); // ✅ Исправлено
+  db.prepare('DELETE FROM rooms WHERE id = ?').run(roomId);
+
+  res.status(200).send('Комната удалена');
+});
 
 // Присоединение к комнате по коду
 router.post('/join', (req, res) => {

@@ -5,6 +5,13 @@ const SQLiteStore = require('connect-sqlite3')(session);
 const db = require('./db');
 const path = require('path');
 
+const app = express();
+const PORT = process.env.PORT || 3000;
+// Парсинг тела
+app.use(express.urlencoded({ extended: true }));
+app.use(express.json());
+app.use(express.static('public'));
+
 const authRoutes = require('./routes/auth');
 const roomRoutes = require('./routes/rooms');
 const pollRoutes = require('./routes/polls');
@@ -12,12 +19,7 @@ const proposalRoutes = require('./routes/proposals');
 const notificationRoutes = require('./routes/notifications');
 
 
-const app = express();
-const PORT = process.env.PORT || 3000;
 
-// Парсинг тела
-app.use(express.urlencoded({ extended: true }));
-app.use(express.json());
 
 // Статические файлы
 app.use(express.static('public'));

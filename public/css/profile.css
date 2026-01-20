@@ -162,3 +162,52 @@ input:checked + .toggle-bg::before {
   transform: scale(1.04);
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
 }
+/* Основная карточка профиля — с эффектом свечения */
+.card-profile {
+  position: relative;
+  background: rgba(26, 26, 46, 0.4);
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(139, 92, 246, 0.2);
+  border-radius: 20px;
+  box-shadow: 
+    0 10px 30px rgba(0, 0, 0, 0.2),
+    0 0 15px rgba(139, 92, 246, 0.1);
+  overflow: hidden;
+  padding: 32px;
+  text-align: center;
+  transition: all 0.3s ease;
+  transform: translateY(20px);
+  opacity: 0;
+}
+
+.card-profile.visible {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+/* Мягкое свечение при наведении */
+.card-profile:hover {
+  transform: translateY(-8px);
+  box-shadow: 
+    0 20px 40px rgba(0, 0, 0, 0.3),
+    0 0 25px rgba(139, 92, 246, 0.2);
+  border-color: rgba(168, 85, 247, 0.4);
+}
+
+/* Градиентная подсветка снизу */
+.card-profile::before {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 80%;
+  height: 4px;
+  background: linear-gradient(90deg, rgba(139, 92, 246, 0), rgba(139, 92, 246, 0.3), rgba(139, 92, 246, 0));
+  border-radius: 2px;
+  transition: opacity 0.3s;
+}
+
+.card-profile:hover::before {
+  opacity: 1;
+}

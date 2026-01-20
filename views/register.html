@@ -4,48 +4,50 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Регистрация — VoteMind</title>
-  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="/css/auth.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"/>
 </head>
-<body class="bg-gray-100 flex items-center justify-center min-h-screen">
-  <div class="bg-white p-8 rounded-lg shadow-md w-full max-w-sm">
-    <h2 class="text-2xl font-bold mb-6 text-center">Регистрация</h2>
-    <form action="/auth/register" method="POST">
-      <div class="mb-4">
-        <label class="block text-gray-700 text-sm font-bold mb-2">Никнейм</label>
+<body class="auth">
+  <div class="auth-card">
+    <h2 class="auth-title">Создайте аккаунт</h2>
+    <form action="/auth/register" method="POST" class="auth-form">
+      <div class="auth-input-group">
         <input
           name="username"
-          class="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring focus:ring-blue-200"
+          class="auth-input"
+          placeholder="Никнейм"
           required
         />
+        <i class="fas fa-user auth-icon"></i>
       </div>
-      <div class="mb-4">
-        <label class="block text-gray-700 text-sm font-bold mb-2">Email</label>
+
+      <div class="auth-input-group">
         <input
           type="email"
           name="email"
-          class="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring focus:ring-blue-200"
+          class="auth-input"
+          placeholder="Email"
           required
         />
+        <i class="fas fa-envelope auth-icon"></i>
       </div>
-      <div class="mb-6">
-        <label class="block text-gray-700 text-sm font-bold mb-2">Пароль</label>
+
+      <div class="auth-input-group">
         <input
           type="password"
           name="password"
-          class="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring focus:ring-blue-200"
+          class="auth-input"
+          placeholder="Пароль"
           required
         />
+        <i class="fas fa-lock auth-icon"></i>
       </div>
-      <button
-        type="submit"
-        class="w-full bg-green-600 text-white font-bold py-2 px-4 rounded-lg hover:bg-green-700 transition"
-      >
-        Зарегистрироваться
-      </button>
+
+      <button type="submit" class="auth-btn">Зарегистрироваться</button>
     </form>
-    <p class="mt-4 text-center text-sm">
+    <p class="auth-links">
       Уже есть аккаунт?
-      <a href="/login" class="text-blue-600 hover:underline">Войти</a>
+      <a href="/login">Войти</a>
     </p>
   </div>
 </body>

@@ -1,0 +1,146 @@
+/* === Адаптивность — mobile-first === */
+
+/* Мобильные устройства (до 768px) */
+@media (max-width: 768px) {
+  .header-wrapper {
+    width: 90%;
+    left: 50%;
+    transform: translateX(-50%);
+  }
+
+  .header-container {
+    min-width: auto;
+    padding: 8px 12px;
+    gap: 8px;
+  }
+
+  .header-container a {
+    font-size: 0.85rem;
+    padding: 4px 6px;
+  }
+
+  .avatar {
+    width: 28px;
+    height: 28px;
+  }
+
+  /* Скрываем "Выйти" на мобилке, если не влезает */
+  .header-container .text-red-600 {
+    display: none;
+  }
+
+  /* Статистика — в одну колонку */
+  .grid-two {
+    grid-template-columns: 1fr;
+    gap: 12px;
+  }
+
+  /* Активность — компактнее */
+  .activity-item {
+    gap: 10px;
+    padding: 10px 0;
+  }
+
+  .activity-icon {
+    font-size: 1.1rem;
+  }
+
+  .activity-text {
+    font-size: 0.9rem;
+  }
+
+  .activity-time {
+    font-size: 0.65rem;
+  }
+
+  /* Убираем двойное направление у flex-between */
+  .flex-between {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 4px;
+  }
+
+  /* Элементы, которые должны остаться горизонтальными */
+  .flex-between.keep-horizontal,
+  .header-container,
+  .activity-item,
+  .glass-btn {
+    flex-direction: row;
+    align-items: center;
+  }
+}
+
+/* Планшеты и маленькие экраны (до 1024px) */
+@media (max-width: 1024px) {
+  .profile-grid {
+    grid-template-columns: 1fr;
+    gap: 20px;
+  }
+
+  .card {
+    padding: 20px;
+  }
+
+  .section-title {
+    font-size: 1.1rem;
+  }
+}
+
+/* Очень маленькие экраны (до 480px) */
+@media (max-width: 480px) {
+  .container {
+    padding: 0 12px;
+  }
+
+  .text-3xl {
+    font-size: 1.5rem;
+  }
+
+  .avatar-large {
+    width: 100px;
+    height: 100px;
+  }
+
+  .glass-btn {
+    font-size: 0.9rem;
+    padding: 0.6rem 1.2rem;
+  }
+
+  #notifications-menu {
+    width: 280px;
+    right: 8px;
+  }
+
+  .notification-item {
+    padding: 10px 12px;
+    font-size: 0.85rem;
+  }
+}
+
+/* Очень узкие экраны (до 375px) */
+@media (max-width: 375px) {
+  .card-profile,
+  .card {
+    padding: 20px 16px;
+  }
+
+  .section-title {
+    font-size: 1rem;
+  }
+
+  .mb-8 {
+    margin-bottom: 24px;
+  }
+
+  .mb-6 {
+    margin-bottom: 20px;
+  }
+
+  .p-8 {
+    padding: 24px 16px;
+  }
+
+  .p-6 {
+    padding: 16px;
+  }
+}

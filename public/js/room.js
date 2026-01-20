@@ -26,6 +26,14 @@ async function loadRoom() {
     document.getElementById('room-desc').textContent = room.description || 'Без описания';
     document.getElementById('room-code').textContent = room.invite_code;
     isOwner = room.is_owner;
+    // Показать крестик только владельцу
+    const deleteBtn = document.getElementById('delete-room-btn');
+    if (isOwner) {
+      deleteBtn.classList.remove('opacity-0');
+      deleteBtn.onclick = deleteRoom;
+    } else {
+      deleteBtn.remove();
+    }
 
     document.getElementById('create-poll-button').classList.toggle('hidden', !isOwner);
     document.getElementById('propose-poll-button').classList.toggle('hidden', isOwner);
@@ -52,29 +60,32 @@ async function loadPolls() {
 
     polls.forEach(poll => {
       const editButtons = isOwner ? `
-        <div class="mt-2 space-x-2">
-          <button onclick="editPoll(${poll.id})" class="text-xs bg-yellow-100 text-yellow-800 px-2 py-1 rounded hover:bg-yellow-200">Ред.</button>
-          <button onclick="deletePoll(${poll.id})" class="text-xs bg-red-100 text-red-800 px-2 py-1 rounded hover:bg-red-200">Удалить</button>
-        </div>
+        <button onclick="editPoll(${poll.id})" class="poll-btn edit">Редактировать</button>
+        <button onclick="deletePoll(${poll.id})" class="poll-btn delete">Удалить</button>
       ` : '';
 
-      const card = `
-        <div class="border rounded-lg p-4 mb-4 bg-gray-50">
-          <h3 class="font-semibold">${poll.question}</h3>
-          <p class="text-sm text-gray-500">Тип: ${
-            { single: 'Один вариант', multiple: 'Несколько', rated_options: 'Оценить каждый (1–5)' }[poll.type]
-          }</p>
-          <p class="text-sm text-gray-500">Голосов: ${poll.vote_count || 0}</p>
-          <button onclick="viewPoll(${poll.id})" class="text-sm text-blue-600 hover:underline mt-2">Подробнее</button>
+      const card = document.createElement('div');
+      card.className = 'poll-card';
+      card.innerHTML = `
+        <h3 class="poll-title">${poll.question}</h3>
+        <p class="poll-info">Тип: ${
+          { single: 'Один вариант', multiple: 'Несколько', rated_options: 'Оценить каждый (1–5)' }[poll.type]
+        }</p>
+        <p class="poll-info">Голосов: ${poll.vote_count || 0}</p>
+        <div class="poll-actions">
+          <button onclick="viewPoll(${poll.id})" class="poll-btn" style="background:rgba(59,130,246,0.2);border:1px solid rgba(59,130,246,0.3);color:#93c5fd;">
+            Подробнее
+          </button>
           ${editButtons}
         </div>
       `;
-      container.insertAdjacentHTML('beforeend', card);
+      container.appendChild(card);
     });
   } catch (err) {
     console.error('Ошибка:', err);
   }
 }
+
 
 // --- Открытие модалки с предложениями ---
 function openProposalsModal() {
@@ -115,10 +126,11 @@ async function loadRoomProposals() {
             ${JSON.parse(p.options).map(opt => `<li>${opt}</li>`).join('')}
           </ul>
         </div>
-        <div class="mt-3 space-x-2">
-          <button onclick="approveProposal(${p.id})" class="text-xs bg-green-600 text-white px-3 py-1 rounded hover:bg-green-700">✅ Одобрить</button>
-          <button onclick="rejectProposal(${p.id}, this)" class="text-xs bg-red-600 text-white px-3 py-1 rounded hover:bg-red-700">❌ Отклонить</button>
+        <div class="mt-3 flex gap-2">
+          <button onclick="approveProposal(${p.id})" class="btn-modal save text-xs px-3 py-1">✅ Одобрить</button>
+          <button onclick="rejectProposal(${p.id}, this)" class="btn-modal cancel text-xs px-3 py-1">❌ Отклонить</button>
         </div>
+
       `;
       content.appendChild(item);
     });
@@ -127,6 +139,7 @@ async function loadRoomProposals() {
     console.error(err);
   }
 }
+
 
 // --- Одобрить предложение ---
 async function approveProposal(id) {
@@ -187,18 +200,19 @@ function addOption() {
   const inputs = document.getElementById('options-inputs');
   const input = document.createElement('input');
   input.type = 'text';
-  input.className = 'option-input w-full px-3 py-2 border rounded-lg mb-2';
+  input.className = 'form-input mt-2'; // ← БЫЛО: option-input → СТАЛО: form-input
   input.placeholder = 'Новый вариант';
   input.required = true;
   inputs.appendChild(input);
 }
+
 
 // --- Отправка нового голосования ---
 document.getElementById('create-poll-modal-form')?.addEventListener('submit', async (e) => {
   e.preventDefault();
   const question = document.getElementById('poll-question').value;
   const type = document.getElementById('poll-type').value;
-  const options = Array.from(document.querySelectorAll('#options-inputs .option-input'))
+  const options = Array.from(document.querySelectorAll('#options-inputs .form-input'))
     .map(el => el.value.trim())
     .filter(text => text);
 
@@ -239,35 +253,50 @@ async function viewPoll(pollId) {
     let html = `<h3 class="text-lg font-semibold mb-4">${currentPoll.question}</h3>`;
 
     if (currentPoll.user_vote) {
-      html += `<p class="text-green-600">Вы уже проголосовали!</p>`;
-    } else if (currentPoll.type === 'rated_options') {
-      html += `<p class="text-gray-700 mb-3">Оцените каждый вариант от 1 до 5:</p>`;
-      currentPoll.options.forEach(opt => {
-        html += `
-          <div class="mb-3">
-            <label class="block font-medium">${opt.text}</label>
-            <select name="rating_${opt.id}" class="mt-1 border rounded px-2 py-1 w-full">
-              <option value="">Не оценено</option>
-              <option value="1">1 — Ужасно</option>
-              <option value="2">2 — Плохо</option>
-              <option value="3">3 — Нормально</option>
-              <option value="4">4 — Хорошо</option>
-              <option value="5">5 — Отлично</option>
-            </select>
-          </div>`;
-      });
-      html += `<button onclick="submitRatedOptions()" class="bg-blue-600 text-white py-2 px-4 rounded mt-4">Оценить всё</button>`;
-    } else {
-      currentPoll.options.forEach(opt => {
-        const inputType = currentPoll.type === 'multiple' ? 'checkbox' : 'radio';
-        html += `
-          <label class="flex items-center mb-2">
-            <input type="${inputType}" name="option" value="${opt.id}" class="mr-2">
-            ${opt.text}
-          </label>`;
-      });
-      html += `<button onclick="submitVote()" class="bg-blue-600 text-white py-2 px-4 rounded mt-4">Проголосовать</button>`;
-    }
+  html += `<p class="text-green-600">Вы уже проголосовали!</p>`;
+} else if (currentPoll.type === 'rated_options') {
+  html += `<p class="text-gray-700 mb-3">Оцените каждый вариант от 1 до 5:</p>`;
+  currentPoll.options.forEach(opt => {
+    html += `
+      <div class="mb-3">
+        <label class="block font-medium text-white">${opt.text}</label>
+        <select name="rating_${opt.id}" class="form-select mt-1 w-full">
+          <option value="">Не оценено</option>
+          <option value="1">1 — Ужасно</option>
+          <option value="2">2 — Плохо</option>
+          <option value="3">3 — Нормально</option>
+          <option value="4">4 — Хорошо</option>
+          <option value="5">5 — Отлично</option>
+        </select>
+      </div>`;
+  });
+  html += `<button onclick="submitRatedOptions()" class="btn-modal save mt-4">Оценить всё</button>`;
+} else {
+  html += `<div class="space-y-2 mb-4">`;
+  currentPoll.options.forEach(opt => {
+    const inputType = currentPoll.type === 'multiple' ? 'checkbox' : 'radio';
+    const nameAttr = 'vote-option'; // единое имя
+
+    html += `
+      <label class="custom-option">
+        <input 
+          type="${inputType}" 
+          name="${nameAttr}" 
+          value="${opt.id}" 
+          class="peer"
+        >
+        <div class="custom-control">
+          ${inputType === 'radio' 
+            ? '<div class="custom-control-inner"></div>' 
+            : '<svg class="w-3 h-3 text-white opacity-0 peer-checked:opacity-100" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"></path></svg>'
+          }
+        </div>
+        <span class="text-gray-200 group-hover:text-white transition">${opt.text}</span>
+      </label>`;
+  });
+  html += `</div>`;
+  html += `<button onclick="submitVote()" class="btn-modal save w-full">Проголосовать</button>`;
+}
 
     // Результаты
     html += `<hr class="my-4">`;
@@ -291,7 +320,10 @@ async function viewPoll(pollId) {
 }
 
 async function submitVote() {
-  const selected = Array.from(document.querySelectorAll('input[name="option"]:checked')).map(el => el.value);
+  const selected = Array.from(
+    document.querySelectorAll('input[type="radio"]:checked, input[type="checkbox"]:checked')
+  ).map(el => el.value);
+
   if (selected.length === 0) return alert('Выберите вариант');
 
   try {
@@ -300,6 +332,7 @@ async function submitVote() {
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ optionId: selected[0] })
     });
+
     if (res.ok) {
       alert('Спасибо за голос!');
       closePollModal();
@@ -311,6 +344,7 @@ async function submitVote() {
     alert('Не удалось проголосовать');
   }
 }
+
 
 async function submitRatedOptions() {
   const ratings = {};
@@ -371,7 +405,7 @@ async function editPoll(pollId) {
     currentPoll.options.forEach(opt => {
       const input = document.createElement('input');
       input.type = 'text';
-      input.className = 'option-input w-full px-3 py-2 border rounded-lg mb-2';
+      input.className = 'form-input mt-2';
       input.value = opt.text;
       input.dataset.id = opt.id;
       input.required = true;
@@ -392,7 +426,7 @@ function addEditOption() {
   const container = document.getElementById('edit-options-inputs');
   const input = document.createElement('input');
   input.type = 'text';
-  input.className = 'option-input w-full px-3 py-2 border rounded-lg mb-2';
+  input.className = 'form-input mt-2'; // ← Исправлено
   input.placeholder = 'Новый вариант';
   input.required = true;
   container.appendChild(input);
@@ -402,7 +436,7 @@ document.getElementById('edit-poll-form')?.addEventListener('submit', async (e) 
   e.preventDefault();
   const pollId = document.getElementById('edit-poll-id').value;
   const question = document.getElementById('edit-poll-question').value;
-  const options = Array.from(document.querySelectorAll('#edit-options-inputs .option-input'))
+  const options = Array.from(document.querySelectorAll('#edit-options-inputs .form-input'))
     .map(el => ({ id: el.dataset.id || null, text: el.value.trim() }))
     .filter(opt => opt.text);
 
@@ -439,7 +473,7 @@ function addProposeOption() {
   const container = document.getElementById('propose-options');
   const input = document.createElement('input');
   input.type = 'text';
-  input.className = 'w-full px-3 py-2 border rounded-lg mb-2';
+  input.className = 'form-input mt-2'; // ← Исправлено
   input.placeholder = 'Новый вариант';
   input.required = true;
   container.appendChild(input);
@@ -450,9 +484,9 @@ document.getElementById('propose-form')?.addEventListener('submit', async (e) =>
   const roomIdInput = document.getElementById('propose-room-id').value;
   const question = document.getElementById('propose-question').value;
   const type = document.getElementById('propose-type').value;
-  const options = Array.from(document.querySelectorAll('#propose-options input'))
-    .map(el => el.value.trim())
-    .filter(v => v);
+  const options = Array.from(document.querySelectorAll('#propose-options .form-input'))
+  .map(el => el.value.trim())
+  .filter(v => v);
 
   if (options.length < 2) return alert('Минимум 2 варианта');
 
@@ -473,6 +507,23 @@ document.getElementById('propose-form')?.addEventListener('submit', async (e) =>
     alert('Не удалось отправить');
   }
 });
+// --- Удаление комнаты (только владелец) ---
+async function deleteRoom() {
+  if (!isOwner) return alert('Только владелец может удалить комнату');
+  if (!confirm('Вы уверены, что хотите удалить комнату? Это нельзя отменить.')) return;
+
+  try {
+    const res = await fetch(`/rooms/${roomId}`, { method: 'DELETE' });
+    if (res.ok) {
+      alert('Комната удалена');
+      window.location.href = '/dashboard';
+    } else {
+      alert('Не удалось удалить комнату');
+    }
+  } catch (err) {
+    alert('Ошибка сети');
+  }
+}
 
 // --- Загрузка при старте ---
 document.addEventListener('DOMContentLoaded', () => {
