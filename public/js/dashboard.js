@@ -20,6 +20,16 @@ function closeOnboarding() {
   // Запоминаем, что пользователь видел
   localStorage.setItem('seenOnboarding', 'true');
 }
+function showToast(message, type = 'success') {
+  const toast = document.getElementById('toast');
+  const msg = document.getElementById('toast-message');
+  msg.textContent = message;
+  toast.classList.remove('hidden');
+
+  setTimeout(() => {
+    toast.classList.add('hidden');
+  }, 3000);
+}
 
 // Автозапуск при загрузке
 document.addEventListener('DOMContentLoaded', () => {

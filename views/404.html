@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Страница не найдена — VoteMind</title>
+  <!-- Font Awesome -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"/>
+  <!-- Подключаем стили -->
+  <link rel="stylesheet" href="/css/404.css">
+  <link rel="stylesheet" href="/css/header.css">
+</head>
+<body class="error-page">
+
+  <!-- Хедер (прозрачный) -->
+  <header>
+    <div class="header-wrapper relative">
+      <div class="header-border-frame">
+        <div class="header-container">
+          <a href="/" class="font-bold">VoteMind</a>
+
+            </a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <!-- Основной контент -->
+  <main class="error-main">
+    <div class="error-container">
+      <div class="error-icon">
+        <i class="fas fa-exclamation-triangle"></i>
+      </div>
+      <h1 class="error-title">404</h1>
+      <p class="error-message">Страница не найдена</p>
+      <p class="error-subtext">
+        Кажется, вы попали не туда. Такого места ещё не существует.
+      </p>
+      <a href="/dashboard" class="btn-home">
+        <i class="fas fa-home"></i> На главную
+      </a>
+    </div>
+  </main>
+
+  <!-- Подключаем JS -->
+  <script>
+    // Переключение темы
+    function toggleTheme(event) {
+      event.preventDefault();
+      const html = document.documentElement;
+      const icon = document.getElementById('theme-icon');
+      if (html.classList.contains('dark')) {
+        html.classList.remove('dark');
+        html.classList.add('light');
+        icon.classList.remove('fa-sun');
+        icon.classList.add('fa-moon');
+        localStorage.setItem('theme', 'light');
+      } else {
+        html.classList.remove('light');
+        html.classList.add('dark');
+        icon.classList.remove('fa-moon');
+        icon.classList.add('fa-sun');
+        localStorage.setItem('theme', 'dark');
+      }
+    }
+
+    // Восстановление темы
+    document.addEventListener('DOMContentLoaded', () => {
+      const saved = localStorage.getItem('theme') || 'dark';
+      document.documentElement.className = saved;
+      document.getElementById('theme-icon').className = 
+        saved === 'dark' ? 'fas fa-moon' : 'fas fa-sun';
+    });
+  </script>
+</body>
+</html>

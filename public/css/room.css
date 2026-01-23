@@ -1,18 +1,20 @@
 /* === КАРТОЧКА ГОЛОСОВАНИЯ === */
 .poll-card {
   position: relative;
-  background: rgba(30, 41, 59, 0.5);
+  background: rgba(30, 41, 59, 0.6); /* Прозрачный фон */
   backdrop-filter: blur(10px);
   -webkit-backdrop-filter: blur(10px);
-  border: 1px solid rgba(139, 92, 246, 0.2);
+  border: 1px solid rgba(139, 92, 246, 0.3);
   border-radius: 16px;
   padding: 18px;
   margin-bottom: 16px;
-  transition: all 0.3s ease;
-  color: inherit;
+  color: #f3f4f6;
   overflow: hidden;
+  transition: all 0.3s ease;
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.25);
 }
 
+/* Внутренняя градиентная рамка */
 .poll-card::before {
   content: '';
   position: absolute;
@@ -20,8 +22,10 @@
   border-radius: 16px;
   padding: 1px;
   background: linear-gradient(45deg, rgba(139, 92, 246, 0.4), transparent, rgba(168, 85, 247, 0.4));
-  -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
-  -webkit-mask-composite: xor;
+  -webkit-mask: 
+    linear-gradient(#fff 0 0) content-box, 
+    linear-gradient(#fff 0 0);
+  -webkit-mask-composite: xor; /* Исключает внутренность */
   mask-composite: exclude;
   pointer-events: none;
 }
@@ -32,10 +36,10 @@
   border-color: rgba(139, 92, 246, 0.5);
 }
 
+/* Заголовок и текст */
 .poll-title {
   font-size: 1.2rem;
   font-weight: 600;
-  color: #f3f4f6;
   margin: 0 0 6px;
 }
 
@@ -45,11 +49,7 @@
   margin: 0 0 6px;
 }
 
-.poll-code {
-  font-size: 0.85rem;
-  color: #717cb4;
-}
-
+/* Кнопки */
 .poll-actions {
   display: flex;
   gap: 8px;
@@ -330,4 +330,46 @@
 #delete-room-btn:hover {
   transform: scale(1.1);
   box-shadow: 0 4px 12px rgba(239, 68, 68, 0.3);
+}
+/* Кнопка копирования ссылки */
+.copy-link-btn {
+  background: rgba(139, 92, 246, 0.2);
+  border: 1px solid rgba(139, 92, 246, 0.3);
+  color: #a78bfa;
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.7rem;
+  transition: all 0.2s ease;
+  cursor: pointer;
+}
+
+.copy-link-btn:hover {
+  background: rgba(139, 92, 246, 0.3);
+  transform: scale(1.1);
+}
+
+/* Подсказка при копировании */
+.copy-feedback {
+  position: fixed;
+  top: 20px;
+  right: 20px;
+  background: rgba(30, 41, 59, 0.95);
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(139, 92, 246, 0.4);
+  color: #d8b4fe;
+  padding: 10px 16px;
+  border-radius: 10px;
+  font-size: 0.9rem;
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
+  z-index: 9999;
+  opacity: 0;
+  transition: opacity 0.3s;
+}
+
+.copy-feedback.show {
+  opacity: 1;
 }

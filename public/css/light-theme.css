@@ -1,0 +1,227 @@
+/* === СВЕТЛАЯ ТЕМА ===
+   Подключается ТОЛЬКО при включённой теме
+   Все стили — поверх main.css
+*/
+
+body.light-theme {
+  background: #f8fafc;
+  color: #1e293b;
+}
+
+/* Хедер — белый с прозрачностью */
+body.light-theme .header-container {
+  background: rgba(255, 255, 255, 0.9) !important;
+  backdrop-filter: blur(10px);
+  border-bottom: 1px solid #e2e8f0;
+}
+
+body.light-theme .header-wrapper.sticky .header-container {
+  border-bottom: 1px solid #cbd5e1;
+}
+
+/* Обводка иконок в хедере */
+body.light-theme .header-border-frame {
+  border: 1px solid #e2e8f0;
+  border-radius: 12px;
+}
+
+/* Меню уведомлений */
+body.light-theme #notifications-menu {
+  background: rgba(255, 255, 255, 0.95);
+  backdrop-filter: blur(12px);
+  border: 1px solid #e2e8f0;
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+}
+
+body.light-theme .notification-item {
+  background: white;
+  border-bottom: 1px solid #f1f5f9;
+}
+
+body.light-theme .notification-item:hover {
+  background: #f8fafc;
+}
+
+/* Карточки */
+body.light-theme .card,
+body.light-theme .auth-card,
+body.light-theme .modal-content,
+body.light-theme .onboarding-tooltip,
+body.light-theme .room-card {
+  background: white;
+  border-color: #e2e8f0;
+  color: #1e293b;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.08);
+}
+
+/* Тень на hover */
+body.light-theme .room-card:hover {
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
+}
+
+/* Формы */
+body.light-theme .form-input,
+body.light-theme .form-select {
+  background: #f8fafc;
+  border-color: #cbd5e1;
+  color: #1e293b;
+}
+
+body.light-theme .form-input:focus,
+body.light-theme .form-select:focus {
+  border-color: #8b5cf6;
+  box-shadow: 0 0 0 2px rgba(139, 92, 246, 0.2);
+}
+
+/* Кнопки */
+body.light-theme .btn-primary {
+  background: #7c3aed;
+}
+
+body.light-theme .btn-primary:hover {
+  background: #6d28d9;
+}
+
+body.light-theme .btn-back {
+  color: #4c1d95;
+  border-color: #e2e8f0;
+}
+
+body.light-theme .btn-back:hover {
+  background: #f8fafc;
+  border-color: #cbd5e1;
+}
+
+/* Кнопки в модалках */
+body.light-theme .btn-modal {
+  color: white;
+}
+
+body.light-theme .btn-modal.save {
+  background: #7c3aed;
+  border: 1px solid #8b5cf6;
+}
+
+body.light-theme .btn-modal.save:hover {
+  background: #6d28d9;
+}
+
+body.light-theme .btn-modal.cancel {
+  background: #dc2626;
+}
+
+body.light-theme .btn-modal.cancel:hover {
+  background: #b91c1c;
+}
+
+/* Поля ввода */
+body.light-theme .form-options input {
+  background: #f8fafc;
+  border-color: #cbd5e1;
+  color: #1e293b;
+}
+
+/* Текст */
+body.light-theme .text-gray-400 {
+  color: #64748b !important;
+}
+
+body.light-theme .room-desc,
+body.light-theme .room-code,
+body.light-theme p,
+body.light-theme .text-sm {
+  color: #64748b;
+}
+
+/* Пропозалы */
+body.light-theme #proposals-list,
+body.light-theme #proposal-content {
+  background: white;
+  border-color: #e2e8f0;
+  color: #1e293b;
+}
+
+body.light-theme .activity-item {
+  border-bottom: 1px solid #f1f5f9;
+}
+
+/* Переключатель */
+body.light-theme .toggle-bg {
+  background: linear-gradient(90deg, #4f46e5, #3b82f6) !important;
+}
+
+/* Онбординг — только если нужен в светлом виде */
+body.light-theme .onboarding-overlay {
+  background: rgba(15, 23, 42, 0.6);
+}
+
+body.light-theme .onboarding-tooltip {
+  background: white;
+  border-color: #e2e8f0;
+  color: #1e293b;
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+}
+
+body.light-theme .onboarding-content h3 {
+  color: #1e293b;
+}
+
+body.light-theme .onboarding-content p {
+  color: #64748b;
+}
+
+/* Кнопка в профиле */
+body.light-theme .glass-btn {
+  background: rgba(255, 255, 255, 0.9);
+  border: 1px solid #cbd5e1;
+  color: #1e293b;
+}
+
+body.light-theme .glass-btn:hover {
+  background: rgba(255, 255, 255, 0.95);
+  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.1);
+}
+
+/* Комнаты */
+body.light-theme #room-name,
+body.light-theme #room-desc,
+body.light-theme #room-code {
+  color: #1e293b;
+}
+
+body.light-theme .room-actions .room-btn {
+  background: white;
+  color: #1e293b;
+  border: 1px solid #cbd5e1;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.08);
+}
+
+body.light-theme .room-actions .room-btn:hover {
+  background: #f8fafc;
+  border-color: #94a3b8;
+}
+
+/* Модалки */
+body.light-theme .modal-content {
+  background: white;
+  border-color: #e2e8f0;
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+}
+
+body.light-theme .modal-header {
+  border-bottom: 1px solid #e2e8f0;
+}
+
+body.light-theme .modal-close {
+  color: #64748b;
+}
+
+body.light-theme .modal-close:hover {
+  background: #f1f5f9;
+  color: #1e293b;
+}
+
+/* Подсказки в формах */
+body.light-theme .form-label {
+  color: #4c1d95;
+}

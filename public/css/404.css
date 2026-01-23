@@ -1,0 +1,144 @@
+/* === Фон и тело === */
+.error-page {
+  min-height: 100vh;
+  background: #0f0f1a;
+  background-image:
+    radial-gradient(circle at 20% 30%, rgba(139, 92, 246, 0.15) 0%, transparent 30%),
+    radial-gradient(circle at 80% 70%, rgba(88, 156, 255, 0.1) 0%, transparent 30%);
+  position: relative;
+  font-family: 'Inter', sans-serif;
+  color: #e0e0ff;
+}
+
+.error-page::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: url("data:image/svg+xml,%3Csvg viewBox='0 0 1440 320' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath fill='%231a1a2e' fill-opacity='0.2' d='M0,192L48,197.3C96,203,192,213,288,202.7C384,192,480,160,576,154.7C672,149,768,171,864,176C960,181,1056,171,1152,154.7C1248,139,1344,117,1392,106.7L1440,96L1440,320L1392,320C1344,320,1248,320,1152,320C1056,320,960,320,864,320C768,320,672,320,576,320C480,320,384,320,288,320C192,320,96,320,48,320L0,320Z'%3E%3C/path%3E%3C/svg%3E") repeat-x;
+  background-size: cover;
+  z-index: -1;
+  pointer-events: none;
+  animation: wave 20s linear infinite;
+}
+
+@keyframes wave {
+  0% { background-position: 0 0; }
+  100% { background-position: 1440px 0; }
+}
+
+/* === Основной контент === */
+.error-main {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: calc(100vh - 60px);
+  padding: 20px;
+}
+
+.error-container {
+  text-align: center;
+  max-width: 480px;
+  padding: 40px 30px;
+  background: rgba(26, 26, 46, 0.4);
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(139, 92, 246, 0.2);
+  border-radius: 20px;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.25);
+  transform: translateY(0);
+  opacity: 0;
+  animation: fadeInUp 0.8s ease forwards;
+}
+
+@keyframes fadeInUp {
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Иконка ошибки */
+.error-icon {
+  font-size: 3rem;
+  color: #f97316;
+  margin-bottom: 16px;
+  text-shadow: 0 0 20px rgba(249, 115, 22, 0.3);
+}
+
+/* Заголовок */
+.error-title {
+  font-size: 4rem;
+  font-weight: 700;
+  color: #f3f4f6;
+  margin: 0;
+  letter-spacing: -2px;
+}
+
+/* Сообщение */
+.error-message {
+  font-size: 1.5rem;
+  font-weight: 500;
+  color: #c4b5fd;
+  margin: 8px 0 4px;
+}
+
+.error-subtext {
+  color: #9fa6c4;
+  font-size: 0.95rem;
+  margin: 0 0 24px;
+  line-height: 1.6;
+}
+
+/* Кнопка */
+.btn-home {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  background: rgba(139, 92, 246, 0.2);
+  border: 1px solid rgba(139, 92, 246, 0.4);
+  color: #d8b4fe;
+  font-weight: 600;
+  padding: 12px 24px;
+  border-radius: 14px;
+  text-decoration: none;
+  transition: all 0.2s ease;
+}
+
+.btn-home:hover {
+  background: rgba(139, 92, 246, 0.3);
+  transform: translateY(-2px);
+  box-shadow: 0 6px 16px rgba(139, 92, 246, 0.2);
+}
+
+/* === Темная/светлая тема === */
+.light {
+  background: #f3f4f6;
+  color: #1e293b;
+}
+
+.light .error-container {
+  background: rgba(255, 255, 255, 0.7);
+  backdrop-filter: blur(12px);
+  border-color: rgba(139, 92, 246, 0.4);
+  color: #1e293b;
+}
+
+.light .error-message {
+  color: #7c3aed;
+}
+
+.light .error-subtext {
+  color: #64748b;
+}
+
+.light .btn-home {
+  color: #7c3aed;
+  border-color: #7c3aed;
+  background: rgba(124, 58, 237, 0.1);
+}
+
+.light .btn-home:hover {
+  background: rgba(124, 58, 237, 0.2);
+}

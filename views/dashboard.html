@@ -6,6 +6,7 @@
   <title>Кабинет — VoteMind</title>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"/>
   <link rel="stylesheet" href="/css/main.css">
+  <link rel="stylesheet" href="/css/light-theme.css">
   <link rel="stylesheet" href="/css/header.css">
   <link rel="stylesheet" href="/css/profile.css">
   <link rel="stylesheet" href="/css/notifications.css">  
@@ -25,6 +26,9 @@
           <a href="#" class="relative" onclick="window.toggleNotifications(event)">
             <i class="fas fa-bell text-base hover:text-indigo-600"></i>
             <span id="notification-badge" class="hidden absolute -top-1 -right-1 bg-indigo-600 text-white text-xs rounded-full w-4 h-4 flex items-center justify-center">0</span>
+          </a>
+          <a href="#" class="ml-3" onclick="toggleTheme(event)">
+            <i id="theme-icon" class="fas fa-moon"></i>
           </a>
           <a href="/profile" class="flex-between hover:bg-gray-100 px-2 py-1 rounded-lg" style="gap: 6px;">
             <img id="header-avatar" src="/img/default-avatar.png" class="avatar" alt="Профиль">
@@ -54,57 +58,63 @@
       <h1 class="text-3xl font-bold">Добро пожаловать</h1>
       <p class="text-gray-400">Создайте комнату или присоединитесь к существующей</p>
     </div>
-
-   <!-- Создание комнаты -->
-<div class="card p-6 mb-6">
-  <h2 class="section-title">
-    <i class="fas fa-plus-circle text-indigo-400"></i> Создать комнату
-  </h2>
-  <form id="create-room-form" action="/rooms" method="POST"> <!-- ✅ Добавь -->
-    <div class="form-field">
-      <label class="form-label">Название</label>
-      <input type="text" name="name" placeholder="Например: Моя группа" class="form-input" required>
+    <div id="toast" class="hidden toast">
+      <i class="fas fa-check-circle"></i> <span id="toast-message"></span>
     </div>
-    <div class="form-field">
-      <label class="form-label">Описание (опционально)</label>
-      <textarea name="description" rows="3" placeholder="Что это за комната?" class="form-input"></textarea>
-    </div>
-    <button type="submit" class="btn-primary">Создать</button>
-  </form>
-</div>
-
-
-    <!-- Присоединение -->
-<div class="card p-6 mb-6">
-  <h2 class="section-title">
-    <i class="fas fa-door-open text-blue-400"></i> Присоединиться к комнате
-  </h2>
-  <form id="join-room-form" action="/rooms/join" method="POST"> <!-- ✅ Добавь -->
-    <div class="form-field">
-      <label class="form-label">Код приглашения</label>
-      <input type="text" name="inviteCode" maxlength="6" placeholder="AB12CD" class="form-input" required>
-    </div>
-    <button type="submit" class="btn-primary btn-info">Присоединиться</button>
-  </form>
-</div>
-
-
-    <!-- Мои комнаты -->
-    <div class="card p-6 mb-6">
-      <h2 class="section-title">
-        <i class="fas fa-users text-purple-400"></i> Мои комнаты
-      </h2>
-      <div id="rooms-list">
-        <p class="text-gray-500 text-sm">Пока нет комнат. Создайте первую!</p>
+  <!-- Действия -->
+<div class="actions-grid mb-8">
+  <!-- Создание комнаты -->
+  <div class="card p-6">
+    <h2 class="section-title">
+      <i class="fas fa-plus-circle text-indigo-400"></i> Создать комнату
+    </h2>
+    <form id="create-room-form" action="/rooms" method="POST">
+      <div class="form-field">
+        <label class="form-label">Название</label>
+        <input type="text" name="name" placeholder="Например: Моя группа" class="form-input" required>
       </div>
-    </div>
+      <div class="form-field">
+        <label class="form-label">Описание (опционально)</label>
+        <textarea name="description" rows="3" placeholder="Что это за комната?" class="form-input"></textarea>
+      </div>
+      <button type="submit" class="btn-primary w-full">Создать комнату</button>
+    </form>
+  </div>
 
-    <!-- Кнопка -->
-    <div class="text-center mb-8">
-      <button onclick="openProposalsModal()" class="glass-btn">
-        <i class="fas fa-hand-paper"></i> Просмотреть предложения
-      </button>
-    </div>
+  <!-- Присоединение -->
+  <div class="card p-6">
+    <h2 class="section-title">
+      <i class="fas fa-door-open text-blue-400"></i> Присоединиться
+    </h2>
+    <form id="join-room-form" action="/rooms/join" method="POST">
+      <div class="form-field">
+        <label class="form-label">Код приглашения</label>
+        <input type="text" name="inviteCode" maxlength="6" placeholder="AB12CD" class="form-input" required>
+      </div>
+      <button type="submit" class="btn-primary btn-info w-full">Войти в комнату</button>
+    </form>
+  </div>
+</div>
+
+<!-- Мои комнаты -->
+<div class="card p-6 mb-8">
+  <h2 class="section-title">
+    <i class="fas fa-users text-purple-400"></i> Мои комнаты
+  </h2>
+  <div id="rooms-list" class="space-y-3">
+    <p class="text-gray-500 text-sm">Пока нет комнат. Создайте первую!</p>
+  </div>
+</div>
+
+<!-- Кнопка предложений -->
+<div class="text-center mb-8">
+  <button onclick="openProposalsModal()" class="glass-btn relative">
+    <i class="fas fa-hand-paper"></i> 
+    <span>Просмотреть предложения</span>
+    <span id="proposals-badge" class="hidden absolute -top-2 -right-2 bg-red-600 text-white text-xs rounded-full w-5 h-5 flex items-center justify-center">0</span>
+  </button>
+</div>
+
   </main>
 
   <!-- Модалка предложений -->
@@ -165,10 +175,14 @@
         const container = document.getElementById('rooms-list');
         container.innerHTML = '';
 
-        if (rooms.length === 0) {
-          container.innerHTML = '<p class="text-gray-500 text-sm">Пока нет комнат. Создайте первую!</p>';
-          return;
-        }
+          if (rooms.length === 0) {
+            container.innerHTML = `
+              <p class="text-center text-gray-500 text-sm py-4">
+                <i class="fas fa-inbox text-xl mb-2 opacity-60"></i><br>
+                Пока нет комнат
+              </p>`;
+            return;
+          }
 
         rooms.forEach(room => {
           const isOwner = room.is_owner;
@@ -185,6 +199,16 @@
             <span class="${roleClass}">${roleText}</span>
           `;
           container.appendChild(el);
+          el.style.opacity = '0';
+          el.style.transform = 'translateY(20px)';
+          container.appendChild(el);
+          // Анимация
+          setTimeout(() => {
+            el.style.transition = 'all 0.3s ease';
+            el.style.opacity = '1';
+            el.style.transform = 'translateY(0)';
+          }, 10);
+
         });
       } catch (err) {
         console.error(err);
@@ -232,6 +256,14 @@
       } catch (err) {
         list.innerHTML = '<p class="text-red-400">Ошибка</p>';
       }
+      // После загрузки предложений — обнови бейдж
+      const badge = document.getElementById('proposals-badge');
+        if (all.length > 0) {
+          badge.classList.remove('hidden');
+          badge.textContent = all.length > 9 ? '9+' : all.length;
+        } else {
+          badge.classList.add('hidden');
+        }
     }
 
     async function approveProposal(id) {
@@ -266,7 +298,21 @@
       setInterval(fetchGlobalNotifications, 10000);
     });
 
-    
+    document.addEventListener('keydown', (e) => {
+      if (e.ctrlKey && e.key === 'n') {
+        e.preventDefault();
+        document.querySelector('[name="name"]')?.focus();
+      }
+      if (e.ctrlKey && e.key === 'j') {
+        e.preventDefault();
+        document.querySelector('[name="inviteCode"]')?.focus();
+      }
+      if (e.key === 'Escape') {
+        closeProposalsModal();
+        document.getElementById('onboarding-overlay')?.classList.contains('active') && closeOnboarding();
+      }
+    });
+
   </script>
 </body>
 </html>

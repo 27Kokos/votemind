@@ -2,7 +2,6 @@
 .card {
   background: rgba(26, 26, 46, 0.4);
   backdrop-filter: blur(10px);
-  -webkit-backdrop-filter: blur(10px);
   border: 1px solid rgba(139, 92, 246, 0.2);
   border-radius: 20px;
   box-shadow: 0 10px 30px rgba(0, 0, 0, 0.25);
@@ -11,6 +10,7 @@
   padding: 24px;
   opacity: 0;
   transform: translateY(20px);
+  margin-bottom: 24px;
 }
 
 .card.visible {
@@ -24,21 +24,31 @@
   border-color: rgba(168, 85, 247, 0.4);
 }
 
+
 /* Аватарка */
 .avatar-large {
   width: 120px;
   height: 120px;
   border: 3px solid rgba(139, 92, 246, 0.3);
   border-radius: 50%;
-  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.3);
-  transition: transform 0.3s;
+  box-shadow: 
+    0 6px 20px rgba(0, 0, 0, 0.3),
+    0 0 30px rgba(139, 92, 246, 0.15); /* мягкое свечение */
+  transition: all 0.3s ease;
   margin: 0 auto 20px;
+  object-fit: cover; /* если аватар не квадратный */
+  opacity: 0.8;
 }
 
 .avatar-large:hover {
-  transform: scale(1.06);
+  transform: scale(1.08);
   border-color: #8b5cf6;
+  box-shadow: 
+    0 10px 30px rgba(0, 0, 0, 0.4),
+    0 0 40px rgba(139, 92, 246, 0.25);
+  opacity: 1;
 }
+
 
 /* Заголовки */
 .section-title {
@@ -143,25 +153,51 @@ input:checked + .toggle-bg::before {
 /* Кнопка */
 .glass-btn {
   background: rgba(109, 40, 217, 0.2);
-  border: 1px solid rgba(168, 85, 247, 0.3);
+  border: 1px solid rgba(168, 85, 247, 0.4);
   color: #d8b4fe;
   font-weight: 600;
   font-size: 0.95rem;
-  padding: 0.75rem 1.5rem;
-  border-radius: 14px;
+  padding: 0.8rem 1.6rem;
+  border-radius: 16px;
   cursor: pointer;
-  transition: all 0.2s;
+  transition: all 0.2s ease;
   display: inline-flex;
   align-items: center;
-  gap: 8px;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  gap: 10px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  position: relative;
+  overflow: hidden;
 }
-
+.glass-btn.full-width {
+  width: 100%;
+  max-width: 240px;
+  justify-content: center;
+}
 .glass-btn:hover {
   background: rgba(139, 92, 246, 0.3);
-  transform: scale(1.04);
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+  transform: translateY(-2px);
+  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.2);
 }
+
+
+.glass-btn::after {
+  content: '';
+  position: absolute;
+  top: -50%;
+  left: -50%;
+  width: 200%;
+  height: 200%;
+  background: radial-gradient(circle, rgba(255, 255, 255, 0.1) 0%, transparent 70%);
+  opacity: 0;
+  transition: opacity 0.3s;
+  pointer-events: none;
+}
+
+.glass-btn:hover::after {
+  opacity: 1;
+  transform: translate(10%, 10%);
+}
+
 /* Основная карточка профиля — с эффектом свечения */
 .card-profile {
   position: relative;
@@ -173,11 +209,12 @@ input:checked + .toggle-bg::before {
     0 10px 30px rgba(0, 0, 0, 0.2),
     0 0 15px rgba(139, 92, 246, 0.1);
   overflow: hidden;
-  padding: 32px;
+  padding: 35px;
   text-align: center;
   transition: all 0.3s ease;
   transform: translateY(20px);
   opacity: 0;
+  margin-bottom: 15px;
 }
 
 .card-profile.visible {
@@ -210,4 +247,38 @@ input:checked + .toggle-bg::before {
 
 .card-profile:hover::before {
   opacity: 1;
+}
+/* Статистика — иконки слева */
+.grid-two {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 16px;
+}
+
+@media (min-width: 768px) {
+  .grid-two {
+    grid-template-columns: 1fr 1fr;
+  }
+}
+
+.stat-item {
+  display: grid;
+  grid-template-columns: 20px 1fr auto;
+  align-items: center;
+  gap: 8px;
+  padding: 12px 14px;
+  background: rgba(30, 41, 59, 0.6);
+  border-radius: 12px;
+  border: 1px solid rgba(139, 92, 246, 0.2);
+  transition: all 0.2s;
+}
+
+.stat-item:hover {
+  background: rgba(139, 92, 246, 0.1);
+  transform: translateY(-2px);
+  border-color: rgba(168, 85, 247, 0.4);
+}
+
+.stat-item i {
+  font-size: 0.9rem;
 }

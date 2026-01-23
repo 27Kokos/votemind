@@ -60,6 +60,9 @@ app.use('/api', require('./routes/notifications-toggle'));
 app.get('/', (req, res) => {
   res.redirect('/login');
 });
+app.get('/404', (req, res) => {
+  res.status(404).sendFile(path.join(__dirname, 'views', '404.html'));
+});
 
 app.get('/login', (req, res) => {
   res.sendFile(path.join(__dirname, 'views', 'login.html'));
@@ -75,6 +78,10 @@ app.get('/dashboard', requireAuth, (req, res) => {
 
 app.get('/room/:id', requireAuth, (req, res) => {
   res.sendFile(path.join(__dirname, 'views', 'room.html'));
+});
+
+app.use((req, res) => {
+  res.status(404).sendFile(path.join(__dirname, 'views', '404.html'));
 });
 
 // Запуск сервера

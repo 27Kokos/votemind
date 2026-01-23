@@ -1,7 +1,7 @@
 // public/js/room.js
 
 const pathParts = window.location.pathname.split('/').filter(part => part);
-const roomId = pathParts[pathParts.length - 1];
+const roomId = parseInt(pathParts[pathParts.length - 1], 10);
 
 console.log('Извлечённый roomId:', roomId);
 
@@ -13,7 +13,6 @@ if (!roomId || isNaN(roomId)) {
 
 let currentPoll = null;
 let isOwner = false;
-let currentProposal = null;
 
 // --- Загрузка данных комнаты ---
 async function loadRoom() {
@@ -26,7 +25,7 @@ async function loadRoom() {
     document.getElementById('room-desc').textContent = room.description || 'Без описания';
     document.getElementById('room-code').textContent = room.invite_code;
     isOwner = room.is_owner;
-    // Показать крестик только владельцу
+
     const deleteBtn = document.getElementById('delete-room-btn');
     if (isOwner) {
       deleteBtn.classList.remove('opacity-0');
@@ -44,7 +43,7 @@ async function loadRoom() {
   }
 }
 
-// --- Загрузка голосований ---
+// --- Загрузка голосований (без мигания!) ---
 async function loadPolls() {
   try {
     const response = await fetch(`/polls/room/${roomId}`);
@@ -54,7 +53,12 @@ async function loadPolls() {
     container.innerHTML = '';
 
     if (polls.length === 0) {
-      container.innerHTML = '<p class="text-gray-500">Пока нет голосований.</p>';
+      container.innerHTML = `
+        <div class="text-center py-8 text-gray-500">
+          <i class="fas fa-poll text-4xl mb-3 opacity-40"></i>
+          <p class="text-lg">Пока нет голосований</p>
+          <p class="text-sm">${isOwner ? 'Создайте первое' : 'Предложите идею'}</p>
+        </div>`;
       return;
     }
 
@@ -65,7 +69,7 @@ async function loadPolls() {
       ` : '';
 
       const card = document.createElement('div');
-      card.className = 'poll-card';
+      card.className = 'poll-card'; // просто добавляем, без .visible
       card.innerHTML = `
         <h3 class="poll-title">${poll.question}</h3>
         <p class="poll-info">Тип: ${
@@ -87,7 +91,7 @@ async function loadPolls() {
 }
 
 
-// --- Открытие модалки с предложениями ---
+// --- Управление предложениями ---
 function openProposalsModal() {
   document.getElementById('proposal-modal').classList.remove('hidden');
   loadRoomProposals();
@@ -97,10 +101,9 @@ function closeProposalModal() {
   document.getElementById('proposal-modal').classList.add('hidden');
 }
 
-// --- Загрузка предложений для этой комнаты ---
 async function loadRoomProposals() {
   const content = document.getElementById('proposal-content');
-  content.innerHTML = '<p>Загрузка предложений...</p>';
+  content.innerHTML = '<p class="text-gray-500">Загрузка предложений...</p>';
 
   try {
     const res = await fetch(`/proposals/room/${roomId}`);
@@ -130,28 +133,25 @@ async function loadRoomProposals() {
           <button onclick="approveProposal(${p.id})" class="btn-modal save text-xs px-3 py-1">✅ Одобрить</button>
           <button onclick="rejectProposal(${p.id}, this)" class="btn-modal cancel text-xs px-3 py-1">❌ Отклонить</button>
         </div>
-
       `;
       content.appendChild(item);
     });
   } catch (err) {
-    content.innerHTML = '<p class="text-red-500">Ошибка загрузки предложений</p>';
+    content.innerHTML = '<p class="text-red-500">Ошибка загрузки</p>';
     console.error(err);
   }
 }
 
-
-// --- Одобрить предложение ---
 async function approveProposal(id) {
   if (!confirm('Одобрить это предложение?')) return;
 
   try {
     const res = await fetch(`/proposals/approve/${id}`, { method: 'POST' });
     if (res.ok) {
-      alert('Предложение одобрено! Голосование создано.');
+      alert('Голосование создано!');
       closeProposalModal();
       loadPolls();
-      fetchGlobalNotifications();
+      fetchGlobalNotifications?.();
     } else {
       alert('Ошибка при одобрении');
     }
@@ -160,23 +160,21 @@ async function approveProposal(id) {
   }
 }
 
-// --- Отклонить предложение ---
 async function rejectProposal(id, btn) {
-  if (!confirm('Отклонить это предложение?')) return;
+  if (!confirm('Отклонить предложение?')) return;
 
   try {
     await fetch(`/proposals/reject/${id}`, { method: 'POST' });
     btn.closest('.mb-4').remove();
   } catch (err) {
-    alert('Ошибка при отклонении');
+    alert('Ошибка');
   }
 }
 
-// --- Модальные окна (создание, редактирование и т.д.) ---
+// --- Создание голосования ---
 function openCreatePollModal() {
   document.getElementById('create-poll-modal').classList.remove('hidden');
   document.getElementById('poll-type').value = 'single';
-  updateOptionsVisibility();
 }
 
 function closeCreatePollModal() {
@@ -187,39 +185,28 @@ function closeCreatePollModal() {
   while (inputs.children.length > 2) {
     inputs.removeChild(inputs.children[0]);
   }
-  updateOptionsVisibility();
-}
-
-function updateOptionsVisibility() {
-  const type = document.getElementById('poll-type').value;
-  const container = document.getElementById('options-container');
-  container.style.display = 'block';
 }
 
 function addOption() {
   const inputs = document.getElementById('options-inputs');
   const input = document.createElement('input');
   input.type = 'text';
-  input.className = 'form-input mt-2'; // ← БЫЛО: option-input → СТАЛО: form-input
+  input.className = 'form-input mt-2';
   input.placeholder = 'Новый вариант';
   input.required = true;
   inputs.appendChild(input);
 }
 
-
-// --- Отправка нового голосования ---
 document.getElementById('create-poll-modal-form')?.addEventListener('submit', async (e) => {
   e.preventDefault();
-  const question = document.getElementById('poll-question').value;
+  const question = document.getElementById('poll-question').value.trim();
   const type = document.getElementById('poll-type').value;
   const options = Array.from(document.querySelectorAll('#options-inputs .form-input'))
     .map(el => el.value.trim())
     .filter(text => text);
 
-  if ((type === 'single' || type === 'multiple') && options.length < 2) {
-    alert('Минимум 2 варианта');
-    return;
-  }
+  if (!question) return alert('Введите вопрос');
+  if (options.length < 2) return alert('Минимум 2 варианта');
 
   try {
     const res = await fetch('/polls', {
@@ -236,7 +223,7 @@ document.getElementById('create-poll-modal-form')?.addEventListener('submit', as
       alert('Ошибка: ' + error);
     }
   } catch (err) {
-    alert('Не удалось отправить');
+    alert('Не удалось создать');
   }
 });
 
@@ -244,7 +231,7 @@ document.getElementById('create-poll-modal-form')?.addEventListener('submit', as
 async function viewPoll(pollId) {
   try {
     const res = await fetch(`/polls/${pollId}`);
-    if (!res.ok) throw new Error('Голосование не найдено');
+    if (!res.ok) throw new Error('Не найдено');
     currentPoll = await res.json();
     const modal = document.getElementById('poll-modal');
     const content = document.getElementById('poll-content');
@@ -253,61 +240,53 @@ async function viewPoll(pollId) {
     let html = `<h3 class="text-lg font-semibold mb-4">${currentPoll.question}</h3>`;
 
     if (currentPoll.user_vote) {
-  html += `<p class="text-green-600">Вы уже проголосовали!</p>`;
-} else if (currentPoll.type === 'rated_options') {
-  html += `<p class="text-gray-700 mb-3">Оцените каждый вариант от 1 до 5:</p>`;
-  currentPoll.options.forEach(opt => {
-    html += `
-      <div class="mb-3">
-        <label class="block font-medium text-white">${opt.text}</label>
-        <select name="rating_${opt.id}" class="form-select mt-1 w-full">
-          <option value="">Не оценено</option>
-          <option value="1">1 — Ужасно</option>
-          <option value="2">2 — Плохо</option>
-          <option value="3">3 — Нормально</option>
-          <option value="4">4 — Хорошо</option>
-          <option value="5">5 — Отлично</option>
-        </select>
-      </div>`;
-  });
-  html += `<button onclick="submitRatedOptions()" class="btn-modal save mt-4">Оценить всё</button>`;
-} else {
-  html += `<div class="space-y-2 mb-4">`;
-  currentPoll.options.forEach(opt => {
-    const inputType = currentPoll.type === 'multiple' ? 'checkbox' : 'radio';
-    const nameAttr = 'vote-option'; // единое имя
-
-    html += `
-      <label class="custom-option">
-        <input 
-          type="${inputType}" 
-          name="${nameAttr}" 
-          value="${opt.id}" 
-          class="peer"
-        >
-        <div class="custom-control">
-          ${inputType === 'radio' 
-            ? '<div class="custom-control-inner"></div>' 
-            : '<svg class="w-3 h-3 text-white opacity-0 peer-checked:opacity-100" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"></path></svg>'
-          }
-        </div>
-        <span class="text-gray-200 group-hover:text-white transition">${opt.text}</span>
-      </label>`;
-  });
-  html += `</div>`;
-  html += `<button onclick="submitVote()" class="btn-modal save w-full">Проголосовать</button>`;
-}
+      html += `<p class="text-green-600">Вы уже проголосовали!</p>`;
+    } else if (currentPoll.type === 'rated_options') {
+      html += `<p class="text-gray-700 mb-3">Оцените каждый вариант:</p>`;
+      currentPoll.options.forEach(opt => {
+        html += `
+          <div class="mb-3">
+            <label class="block font-medium text-white">${opt.text}</label>
+            <select name="rating_${opt.id}" class="form-select mt-1 w-full">
+              <option value="">—</option>
+              <option value="1">1 — Ужасно</option>
+              <option value="2">2 — Плохо</option>
+              <option value="3">3 — Нормально</option>
+              <option value="4">4 — Хорошо</option>
+              <option value="5">5 — Отлично</option>
+            </select>
+          </div>`;
+      });
+      html += `<button onclick="submitRatedOptions()" class="btn-modal save mt-4 w-full">Оценить</button>`;
+    } else {
+      html += `<div class="space-y-2 mb-4">`;
+      currentPoll.options.forEach(opt => {
+        const inputType = currentPoll.type === 'multiple' ? 'checkbox' : 'radio';
+        html += `
+          <label class="custom-option">
+            <input type="${inputType}" name="vote-option" value="${opt.id}" class="peer">
+            <div class="custom-control">
+              ${inputType === 'radio'
+                ? '<div class="custom-control-inner"></div>'
+                : '<svg class="w-3 h-3 text-white opacity-0 peer-checked:opacity-100" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"></path></svg>'
+              }
+            </div>
+            <span class="text-gray-200 group-hover:text-white transition">${opt.text}</span>
+          </label>`;
+      });
+      html += `</div>`;
+      html += `<button onclick="submitVote()" class="btn-modal save w-full">Проголосовать</button>`;
+    }
 
     // Результаты
-    html += `<hr class="my-4">`;
+    html += `<hr class="my-4 border-gray-700">`;
+    html += `<h4 class="font-medium">Результаты:</h4>`;
     if (currentPoll.type === 'rated_options') {
-      html += `<h4 class="font-medium mt-4">Средние оценки:</h4>`;
       currentPoll.options.forEach(opt => {
         const avg = opt.average_rating ? Number(opt.average_rating).toFixed(1) : '—';
         html += `<div>${opt.text}: <strong>${avg}</strong> (${opt.vote_count} голосов)</div>`;
       });
     } else {
-      html += `<h4 class="font-medium mt-4">Результаты:</h4>`;
       currentPoll.options.forEach(opt => {
         html += `<div>${opt.text}: <strong>${opt.votes || 0}</strong> голосов</div>`;
       });
@@ -315,14 +294,13 @@ async function viewPoll(pollId) {
 
     content.innerHTML = html;
   } catch (err) {
-    alert('Не удалось загрузить голосование');
+    alert('Ошибка загрузки');
   }
 }
 
 async function submitVote() {
-  const selected = Array.from(
-    document.querySelectorAll('input[type="radio"]:checked, input[type="checkbox"]:checked')
-  ).map(el => el.value);
+  const selected = Array.from(document.querySelectorAll('input[type="radio"]:checked, input[type="checkbox"]:checked'))
+    .map(el => el.value);
 
   if (selected.length === 0) return alert('Выберите вариант');
 
@@ -345,7 +323,6 @@ async function submitVote() {
   }
 }
 
-
 async function submitRatedOptions() {
   const ratings = {};
   let valid = true;
@@ -363,11 +340,11 @@ async function submitRatedOptions() {
       body: JSON.stringify({ ratings })
     });
     if (res.ok) {
-      alert('Спасибо за оценки!');
+      alert('Спасибо!');
       closePollModal();
       loadPolls();
     } else {
-      alert('Ошибка при оценке');
+      alert('Ошибка');
     }
   } catch (err) {
     alert('Не удалось оценить');
@@ -378,17 +355,7 @@ function closePollModal() {
   document.getElementById('poll-modal').classList.add('hidden');
 }
 
-async function deletePoll(pollId) {
-  if (!confirm('Удалить это голосование?')) return;
-  try {
-    const res = await fetch(`/polls/${pollId}`, { method: 'DELETE' });
-    if (res.ok) loadPolls();
-    else alert('Не удалось удалить');
-  } catch (err) {
-    alert('Ошибка сети');
-  }
-}
-
+// --- Редактирование ---
 async function editPoll(pollId) {
   try {
     const res = await fetch(`/polls/${pollId}`);
@@ -398,7 +365,6 @@ async function editPoll(pollId) {
 
     document.getElementById('edit-poll-id').value = currentPoll.id;
     document.getElementById('edit-poll-question').value = currentPoll.question;
-    document.getElementById('edit-poll-type').value = currentPoll.type;
 
     const container = document.getElementById('edit-options-inputs');
     container.innerHTML = '';
@@ -426,7 +392,7 @@ function addEditOption() {
   const container = document.getElementById('edit-options-inputs');
   const input = document.createElement('input');
   input.type = 'text';
-  input.className = 'form-input mt-2'; // ← Исправлено
+  input.className = 'form-input mt-2';
   input.placeholder = 'Новый вариант';
   input.required = true;
   container.appendChild(input);
@@ -460,6 +426,7 @@ document.getElementById('edit-poll-form')?.addEventListener('submit', async (e) 
   }
 });
 
+// --- Предложить голосование ---
 function openProposeModal() {
   document.getElementById('propose-room-id').value = roomId;
   document.getElementById('propose-modal').classList.remove('hidden');
@@ -473,7 +440,7 @@ function addProposeOption() {
   const container = document.getElementById('propose-options');
   const input = document.createElement('input');
   input.type = 'text';
-  input.className = 'form-input mt-2'; // ← Исправлено
+  input.className = 'form-input mt-2';
   input.placeholder = 'Новый вариант';
   input.required = true;
   container.appendChild(input);
@@ -481,36 +448,47 @@ function addProposeOption() {
 
 document.getElementById('propose-form')?.addEventListener('submit', async (e) => {
   e.preventDefault();
-  const roomIdInput = document.getElementById('propose-room-id').value;
-  const question = document.getElementById('propose-question').value;
+  const question = document.getElementById('propose-question').value.trim();
   const type = document.getElementById('propose-type').value;
   const options = Array.from(document.querySelectorAll('#propose-options .form-input'))
-  .map(el => el.value.trim())
-  .filter(v => v);
+    .map(el => el.value.trim())
+    .filter(v => v);
 
+  if (!question) return alert('Введите вопрос');
   if (options.length < 2) return alert('Минимум 2 варианта');
 
   try {
     const res = await fetch('/proposals/propose', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ roomId: roomIdInput, question, type, options })
+      body: JSON.stringify({ roomId, question, type, options })
     });
     if (res.ok) {
       closeProposeModal();
-      alert('Предложение отправлено владельцу');
+      alert('Предложение отправлено!');
     } else {
       alert('Ошибка при отправке');
     }
   } catch (err) {
-    console.error('Ошибка при отправке предложения:', err);
     alert('Не удалось отправить');
   }
 });
-// --- Удаление комнаты (только владелец) ---
+
+// --- Удаление голосования и комнаты ---
+async function deletePoll(pollId) {
+  if (!confirm('Удалить голосование?')) return;
+  try {
+    const res = await fetch(`/polls/${pollId}`, { method: 'DELETE' });
+    if (res.ok) loadPolls();
+    else alert('Не удалось удалить');
+  } catch (err) {
+    alert('Ошибка сети');
+  }
+}
+
 async function deleteRoom() {
-  if (!isOwner) return alert('Только владелец может удалить комнату');
-  if (!confirm('Вы уверены, что хотите удалить комнату? Это нельзя отменить.')) return;
+  if (!isOwner) return alert('Только владелец может удалить');
+  if (!confirm('Удалить комнату? Это нельзя отменить.')) return;
 
   try {
     const res = await fetch(`/rooms/${roomId}`, { method: 'DELETE' });
@@ -518,18 +496,52 @@ async function deleteRoom() {
       alert('Комната удалена');
       window.location.href = '/dashboard';
     } else {
-      alert('Не удалось удалить комнату');
+      alert('Не удалось удалить');
     }
   } catch (err) {
     alert('Ошибка сети');
   }
 }
 
-// --- Загрузка при старте ---
+// === Копирование ссылки ===
+async function copyInviteLink(event) {
+  event.preventDefault();
+  const code = document.getElementById('room-code')?.textContent?.trim();
+  if (!code) return showToast('Код не найден', 'error');
+
+  const url = `${window.location.origin}/room/join/${code}`;
+  try {
+    await navigator.clipboard.writeText(url);
+    showToast('Ссылка скопирована!', 'success');
+  } catch (err) {
+    showToast('Не удалось скопировать', 'error');
+  }
+}
+
+function showToast(message, type = 'success') {
+  let feedback = document.getElementById('copy-feedback-tooltip');
+  if (!feedback) {
+    feedback = document.createElement('div');
+    feedback.id = 'copy-feedback-tooltip';
+    feedback.className = 'copy-feedback';
+    feedback.innerHTML = `<i class="fas fa-copy mr-2"></i> <span id="feedback-text"></span>`;
+    document.body.appendChild(feedback);
+  }
+
+  const textEl = feedback.querySelector('#feedback-text');
+  textEl.textContent = message;
+
+  const icon = feedback.querySelector('i');
+  icon.className = type === 'success' ? 'fas fa-check mr-2' : 'fas fa-times mr-2';
+  icon.style.color = type === 'success' ? '#6ee7b7' : '#fca5a5';
+
+  feedback.classList.add('show');
+  setTimeout(() => feedback.classList.remove('show'), 2500);
+}
+
 document.addEventListener('DOMContentLoaded', () => {
   if (document.getElementById('room-name')) {
-    loadRoom();
-    loadPolls();
-    setInterval(loadPolls, 3000);
+    loadRoom().then(loadPolls); // Ждём loadRoom → потом loadPolls
   }
 });
+

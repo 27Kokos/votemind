@@ -8,10 +8,12 @@
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"/>
   <!-- Подключаем наши CSS -->
   <link rel="stylesheet" href="/css/main.css">
+  <link rel="stylesheet" href="/css/light-theme.css">
   <link rel="stylesheet" href="/css/header.css">
   <link rel="stylesheet" href="/css/profile.css">
   <link rel="stylesheet" href="/css/notifications.css">
   <link rel="stylesheet" href="/css/adaptive.css">
+  
 </head>
 <body>
 
@@ -26,6 +28,9 @@
           <a href="#" class="relative" onclick="window.toggleNotifications(event)">
             <i class="fas fa-bell text-base hover:text-indigo-600"></i>
             <span id="notification-badge" class="hidden absolute -top-1 -right-1 bg-indigo-600 text-white text-xs rounded-full w-4 h-4 flex items-center justify-center">0</span>
+          </a>
+          <a href="#" class="ml-3" onclick="toggleTheme(event)">
+            <i id="theme-icon" class="fas fa-moon"></i>
           </a>
           <a href="/profile" class="flex-between hover:bg-gray-100 px-2 py-1 rounded-lg" style="gap: 6px;">
             <img id="header-avatar" src="/img/default-avatar.png" class="avatar" alt="Профиль">
@@ -51,16 +56,14 @@
   <div class="spacer" style="height: 80px;"></div>
 
 
-  <!-- Контент -->
+   <!-- Контент -->
   <main class="container">
-    <div class="text-center mb-8">
-      <!-- Карточка профиля -->
-      <div class="card-profile visible">
-        <img id="current-avatar" src="/img/default-avatar.png" class="avatar-large" alt="Аватар">
-        <h1 class="text-3xl font-bold mb-2">Ваш профиль</h1>
-        <p>Персональная статистика и активность</p>
-      </div>
-
+    <!-- Карточка профиля -->
+    <div class="card-profile visible text-center">
+      <img id="current-avatar" src="/img/default-avatar.png" class="avatar-large" alt="Аватар">
+      <h1 class="text-3xl font-bold mb-2">Ваш профиль</h1>
+      <p>Персональная статистика и активность</p>
+    </div>
 
     <!-- Инфо и статистика -->
     <div class="profile-grid mb-8">
@@ -87,26 +90,30 @@
           <i class="fas fa-chart-bar text-indigo-600"></i> Статистика
         </h3>
         <div class="grid-two text-sm">
-          <div class="flex-between">
-            <span><i class="fas fa-lightbulb text-indigo-400 mr-2"></i> Предложено</span>
-            <span class="font-medium" id="total-proposals">0</span>
+          <div class="stat-item">
+            <i class="fas fa-lightbulb text-indigo-400"></i>
+            <span>Предложено</span>
+            <strong id="total-proposals">0</strong>
           </div>
-
-          <div class="flex-between">
+          <div class="stat-item">
+            <i class="fas fa-check-circle text-green-500"></i>
             <span>Одобрено</span>
-            <span class="font-medium" id="approved-proposals">—</span>
+            <strong id="approved-proposals">—</strong>
           </div>
-          <div class="flex-between">
+          <div class="stat-item">
+            <i class="fas fa-vote-yea text-blue-500"></i>
             <span>Проголосовал</span>
-            <span class="font-medium" id="total-votes">—</span>
+            <strong id="total-votes">—</strong>
           </div>
-          <div class="flex-between">
+          <div class="stat-item">
+            <i class="fas fa-door-open text-purple-500"></i>
             <span>Комнат</span>
-            <span class="font-medium" id="total-rooms">—</span>
+            <strong id="total-rooms">—</strong>
           </div>
-          <div class="flex-between">
-            <span>Самая активная</span>
-            <span class="font-medium text-blue-600" id="active-room">—</span>
+          <div class="stat-item">
+            <i class="fas fa-bolt text-yellow-500"></i>
+            <span>Активность</span>
+            <strong class="text-blue-600" id="active-room">—</strong>
           </div>
         </div>
       </div>
@@ -137,7 +144,7 @@
     </div>
 
     <!-- Кнопка изменить фото -->
-    <div class="text-center mb-8">
+    <div class="flex justify-center mb-8">
       <form id="avatar-form" action="/profile/avatar" method="POST" enctype="multipart/form-data">
         <label class="glass-btn cursor-pointer">
           <i class="fas fa-upload"></i> Изменить фото
@@ -147,7 +154,9 @@
     </div>
   </main>
 
+
   <!-- Подключаем JS -->
+   <script src="/js/header.js"></script>
   <script src="/js/notifications.js"></script>
   <script>
     // === Плавное появление при скролле ===
