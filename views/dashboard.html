@@ -119,10 +119,24 @@
       </div>
     </div>
   </div>
+<!-- Онбординг: Подсказка 1 -->
+<div id="onboarding-overlay" class="onboarding-overlay"></div>
+
+<div id="onboarding-tooltip" class="onboarding-tooltip">
+  <div class="onboarding-content">
+    <h3>🎯 Создайте свою первую комнату</h3>
+    <p>Здесь вы будете создавать голосования и управлять обсуждениями.</p>
+    <button onclick="closeOnboarding()" class="btn-modal save">Понятно!</button>
+  </div>
+  <div class="onboarding-arrow"></div>
+</div>
+
+
 
   <!-- JS -->
   <script src="/js/notifications.js"></script>
   <script src="/js/header.js"></script>
+  <script src="/js/dashboard.js"></script>
   <script>
     // Липкий хедер
     const headerWrapper = document.querySelector('.header-wrapper');
