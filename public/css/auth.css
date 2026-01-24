@@ -278,3 +278,85 @@ body.auth::before {
     transform: translateY(0);
   }
 }
+/* === ОШИБКА ФОРМЫ (одна, сверху кнопки) === */
+.form-error {
+  margin-top: 16px;
+  padding: 12px;
+  background: rgba(239, 68, 68, 0.2);
+  border: 1px solid rgba(239, 68, 68, 0.3);
+  border-radius: 12px;
+  color: #fca5a5;
+  font-size: 0.9rem;
+  text-align: center;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  animation: fadeIn 0.3s ease;
+}
+
+.form-error i {
+  font-size: 1.1rem;
+}
+
+.form-error.hidden {
+  display: none;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(-10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+/* === РАЗДЕЛИТЕЛЬ С ТЕКСТОМ === */
+.auth-divider {
+  margin: 20px 0;
+  text-align: center;
+  position: relative;
+}
+
+.auth-divider span {
+  position: relative;
+  background: rgba(30, 41, 59, 0.65);
+  padding: 0 15px;
+  font-size: 0.9rem;
+  color: #9fa6c4;
+  z-index: 1;
+}
+
+.auth-divider::before {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 0;
+  width: 100%;
+  height: 1px;
+  background: rgba(139, 92, 246, 0.2);
+  transform: translateY(-50%);
+  z-index: 0;
+}
+
+/* === ПЛАВАЮЩАЯ АНИМАЦИЯ КАРТОЧКИ === */
+.auth-card {
+  animation: floatUp 0.7s ease forwards;
+}
+
+@keyframes floatUp {
+  0% {
+    opacity: 0;
+    transform: translateY(30px) scale(0.98);
+  }
+  70% {
+    transform: translateY(-10px) scale(1.01);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+/* === УЛУЧШЕННАЯ ТЕНЬ ДЛЯ КАРТОЧКИ === */
+.auth-card {
+  box-shadow: 
+    0 24px 60px rgba(0, 0, 0, 0.35),
+    0 0 40px rgba(139, 92, 246, 0.08);
+}

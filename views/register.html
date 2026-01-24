@@ -10,13 +10,16 @@
 <body class="auth">
   <div class="auth-card">
     <h2 class="auth-title">Создайте аккаунт</h2>
-    <form action="/auth/register" method="POST" class="auth-form">
+
+    <form action="/auth/register" method="POST" class="auth-form" id="register-form">
       <div class="auth-input-group">
         <input
           name="username"
+          id="username"
           class="auth-input"
           placeholder="Никнейм"
           required
+          minlength="3"
         />
         <i class="fas fa-user auth-icon"></i>
       </div>
@@ -25,6 +28,7 @@
         <input
           type="email"
           name="email"
+          id="email"
           class="auth-input"
           placeholder="Email"
           required
@@ -36,15 +40,22 @@
         <input
           type="password"
           name="password"
+          id="password"
           class="auth-input"
           placeholder="Пароль"
           required
+          minlength="6"
         />
         <i class="fas fa-lock auth-icon"></i>
       </div>
 
-      <button type="submit" class="auth-btn">Зарегистрироваться</button>
+      <div id="form-error" class="form-error hidden">
+        <i class="fas fa-exclamation-circle"></i> <span id="error-message"></span>
+      </div>
+
+      <button type="submit" class="auth-btn" id="submit-btn">Зарегистрироваться</button>
     </form>
+
     <p class="auth-links">
       Уже есть аккаунт?
       <a href="/login">Войти</a>
